@@ -1,14 +1,13 @@
-# **Booth.pm API unofficial**
+# **[Booth.pm](http://booth.pm/) 非公式API**
 
-## **Overview**
-
+## **概要**
 <img src="banner.jpg">
-The Booth.pm Scraper API is a web scraping tool designed to extract information from the popular e-commerce platform <a href="https://booth.pm">Booth.pm</a>. This API allows users to retrieve details about all available free items on the site and provides the functionality to download them.
+<a href="http://booth.pm">Booth.pm</a> Scraper APIは、人気のある電子商取引プラットフォーム Booth.pm から情報を抽出するためのウェブスクレイピングツールです。このAPIを使用すると、サイトで利用可能なすべての無料アイテムに関する詳細を取得し、それらをダウンロードする機能を提供します。
 
-## **Contributing**
+## **貢献**
 
-We welcome contributions to enhance the functionality and usability of the Booth.pm Scraper API. If you find a bug, have a feature request, or want to contribute code, please follow our [Contribution Guidelines](https://chat.openai.com/c/CONTRIBUTING.md).
+私たちは Booth.pm Scraper APIの機能と使いやすさを向上させるための貢献を歓迎します。バグを見つけた場合、機能の要望がある場合、またはコードを貢献したい場合は、私たちの[貢献ガイドライン](https://chat.openai.com/c/CONTRIBUTING.md)に従ってください。
 
-## **License**
+## **ライセンス**
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+このプロジェクトはMITライセンスの下でライセンスされています - 詳細はLICENSEファイルを参照してください。
