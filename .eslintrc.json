@@ -1,0 +1,61 @@
+{
+    "env": {
+      "browser": false,
+      "es2021": true
+    },
+    "extends": "standard-with-typescript",
+    "overrides": [],
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "rules": {
+      "@typescript-eslint/semi": ["error", "always"],
+      "@typescript-eslint/naming-convention": [
+        "error",
+        {
+          "selector": "variable",
+          "format": ["camelCase", "UPPER_CASE"],
+          "leadingUnderscore": "allow"
+        },
+        {
+          "selector": "function",
+          "format": ["camelCase"],
+          "leadingUnderscore": "allow"
+        },
+        {
+          "selector": "class",
+          "format": ["PascalCase"],
+          "leadingUnderscore": "allow"
+        }
+      ],
+      "@typescript-eslint/explicit-member-accessibility": [
+        "error",
+        {
+          "accessibility": "explicit",
+          "overrides": {
+            "constructors": "no-public"
+          }
+        }
+      ],
+      "@typescript-eslint/member-delimiter-style": [
+        "error",
+        {
+          "multiline": {
+            "delimiter": "semi",
+            "requireLast": true
+          },
+          "singleline": {
+            "delimiter": "semi",
+            "requireLast": true
+          }
+        }
+      ],
+      "@typescript-eslint/strict-boolean-expressions": "off"
+    },
+    "ignorePatterns": [
+      "webpack.config.js",
+      "jest.config.js",
+      "public/assets/js/**.js"
+    ]
+  }
