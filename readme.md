@@ -2,8 +2,8 @@
 
 ## **Overview**
 
-<a href="banner.jpg">
-The Booth.pm Scraper API is a web scraping tool designed to extract information from the popular e-commerce platform [Booth.pm](https://booth.pm/). This API allows users to retrieve details about all available free items on the site and provides the functionality to download them.
+<img src="banner.jpg">
+The Booth.pm Scraper API is a web scraping tool designed to extract information from the popular e-commerce platform <a href="https://booth.pm">Booth.pm</a>. This API allows users to retrieve details about all available free items on the site and provides the functionality to download them.
 
 ## **Contributing**
 
