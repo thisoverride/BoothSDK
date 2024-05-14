@@ -50,6 +50,7 @@ export default class ExpressApp {
         if (!(controller in controllerObject) || typeof controllerObject[controller] !== 'function') {
           throw new Error(`The function ${controller} is not a valid controller in the provided object.`);
         }
+
         // eslint-disable-next-line @typescript-eslint/ban-types
         (this._app as unknown as Record<string, Function>)[method](path, (req: Request, res: Response) =>
           controllerObject[controller](req, res));
@@ -91,7 +92,6 @@ export default class ExpressApp {
    */
   public async startEngine (port: number): Promise<void> {
     try {
-      // await database.authenticate();
       this._app.listen(port, () => {
         console.info('\x1b[1m\x1b[36m%s\x1b[0m', `Service running on http://localhost:${port}`);
       });

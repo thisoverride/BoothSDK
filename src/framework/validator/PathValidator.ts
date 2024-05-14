@@ -8,6 +8,10 @@ export default class PathValidator {
       throw new Error(`Error route injection ${route} is not a correct route injection.`);
     }
 
+    if (route.includes('"')) {
+      throw new Error(`Error forbidden ${route} is not correcly formatted`);
+    }
+
     let httpMethod: string = matches[1];
 
     if (!validHttpMethods.includes(httpMethod)) {
