@@ -1,13 +1,28 @@
-# **[Booth.pm](http://booth.pm/) 非公式API**
+## **はじめに**
 <p>English version <a href="readme-en.md">Here</a></p>
-## **概要**
-<img src="banner.jpg">
-<a href="http://booth.pm">Booth.pm</a> Scraper APIは、人気のある電子商取引プラットフォーム Booth.pm から情報を抽出するためのウェブスクレイピングツールです。このAPIを使用すると、サイトで利用可能なすべての無料アイテムに関する詳細を取得し、それらをダウンロードする機能を提供します。
+Booth SDKは、人気のあるeコマースプラットフォーム[Booth.pm](http://booth.pm/)からさまざまな商品情報を抽出するためのウェブスクレイピングツールです。サイト上のすべての無料および有料商品の詳細情報を取得することが可能で、無料の商品のダウンロードも可能です。
 
 ## **貢献**
 
-私たちは Booth.pm Scraper APIの機能と使いやすさを向上させるための貢献を歓迎します。バグを見つけた場合、機能の要望がある場合、またはコードを貢献したい場合は、私たちの[貢献ガイドライン](https://chat.openai.com/c/CONTRIBUTING.md)に従ってください。
+Booth SDKの機能や使いやすさを改善するための貢献を大歓迎します。バグを見つけた場合、機能の要望がある場合、またはコードに貢献したい場合は、私たちの貢献ガイドラインに従ってください。
+
+## **使用例**
+
+Booth SDKの使用例を以下に示します。
+
+```jsx
+import BoothSDK from './lib/BoothSDK';
+
+void (async () => {
+  const boothSDK = new BoothSDK({ lang: 'en', adultContent: true });
+  boothSDK.authenticator.connect(); //資格情報なしで接続
+
+  const response = await boothSDK.product.getItem(3787377); //ダウンロードする商品のID
+  await boothSDK.product.download({ path: './downloads', boothProductItem: response }); // ./downloadsに保存
+})();
+
+```
 
 ## **ライセンス**
 
-このプロジェクトはMITライセンスの下でライセンスされています - 詳細はLICENSEファイルを参照してください。
+このプロジェクトはMITライセンスの下でライセンスされています - 詳細はLICENSEファイルをご覧ください。
