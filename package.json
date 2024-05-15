@@ -13,10 +13,9 @@
     "wp": "webpack --watch"
   },
   "devDependencies": {
-    "@types/express": "^4.17.21",
     "@types/jest": "^29.5.11",
-    "@types/morgan": "^1.9.9",
     "@types/node": "^20.11.6",
+    "@types/tough-cookie": "^4.0.5",
     "@types/validator": "^13.11.8",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
@@ -30,14 +29,11 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "axios": "^1.6.7",
+    "axios": "^1.6.8",
+    "axios-cookiejar-support": "^5.0.2",
     "cheerio": "^1.0.0-rc.12",
-    "express": "^4.18.2",
-    "helmet": "^7.1.0",
-    "morgan": "^1.10.0",
     "puppeteer": "^22.0.0",
-    "ts-loader": "^9.5.1",
-    "webpack": "^5.90.0",
-    "webpack-cli": "^5.1.4"
+    "puppeteer-extra": "^3.3.6",
+    "tough-cookie": "^4.1.4"
   }
 }
