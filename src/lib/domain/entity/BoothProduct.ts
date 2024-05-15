@@ -1,4 +1,4 @@
-export default class ProductEntity {
+export default class BoothProduct {
   private readonly productId: number;
   private readonly productBrand: string;
   private readonly productCategory: number;

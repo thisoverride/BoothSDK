@@ -1,0 +1,20 @@
+{
+  "apiEndpoints": {
+    "baseUrl": "https://booth.pm/",
+    "productEndpoints": {
+      "search": "/search/",
+      "listItems": "/items?page=",
+      "getById": "/items/"
+    },
+    "productParams": {
+      "new": "&sort=new"
+    },
+    "authEndpoints": {
+      "signIn": "https://accounts.pixiv.net/login?prompt=select_account&return_to=https%3A%2F%2Fbooth.pm%2Fusers%2Fauth%2Fpixiv&source=booth&view_type=page&_gl=1*tye5an*_ga*NzMxMDk4NDI1LjE3MDcxODI0OTU.*_ga_RWT2QKJLDC*MTcwNzE4MjQ5NC4xLjEuMTcwNzE4MjUyNC4zMC4wLjA.",
+      "meta": {
+        "SDK_CONNECT": [{"name":"_plaza_session_nktz7u","value":"sY3Akg%2FD%2BNNLHqhXCvV1O%2Flz62lrIgLEjmxKavW1lHv7tVWhK6tetV3TAsF8gFwVL%2FK3Jh64orS%2BT2gFPIgalolKVweykqraHC9aLEPMegtPVxFXbnbUkuDKJc9mxq0XDL5ROF%2FA0mby8EAbmsCqhhfTiaz9JVl19NoP1R0vKlyJ%2FvwGRLB7JMNLnmlgWJ%2FCQwfZY6wNXQNjVN5VP5QCBtBR7Fwz9IsAiYMzMpwMXqYdI1nWGKb9OiKlniLQT9sY8o7N1q7HNE6bQTaGnoMHhcDYNJcPM1lhyE6k1VD2aXBO%2FGMpqTnWHLpQBo6mZwizcwguh1KMDIqcZGnx84Z3xhrErZ%2FybGyuSgv50rdwqmxshwwWq5iFu%2BhLHyeDrG3BEB%2BOHbRmvCUXmt0MGohrk5GIUlF08TuRUbP3VOztiQJrmaISl%2FP7LF1LWBg6GKNCe%2BQQ9iLFLvf9jE8Htv94z31orZqU7HuakDDtq5gq0GxOyCLRN8uIVRAL2zNGOTYiEibAMeXjrhLJehdI9mXDyohWJwZuMszsBZAYtCtXBi3MJfcpvgeaZqrc%2FyqArLMTyn50iNkrtELjB9DqhiQzR6xUvyZlDM3D38DsgOQNx8UZ9KBu7Wa82WTHd7DtKT1YE%2BaNTBoGECBfoU6sO0OK9G8FvA2m6upBdpQlsn4FgAyNsanW25zbLcydPcar5H2aCz8Iaqz4KWPX13iY4aDzVzjif0wiD9MDnGAA6QdNOFe8l%2Fu7EY%2FcGpvYDx4VBZBTJchVVZev6D0kVUwsqJv%2FJ80hX5l22rXC37oQfuMXbaLm%2FpUdbsB6IQCZhCmN02Bx9k6fksqI2FbOyhrqOetBJgqB5%2F0iQVV36wwcoI4O%2Fw%3D%3D--NH8ncHqu84xRrq1D--uveY7ruuJLaU5Vh%2BwnzX8Q%3D%3D","domain":".booth.pm","path":"/","expires":1747270590.424942,"httpOnly":true,"secure":true,"sameSite":"Lax"},{"name":"cf_clearance","value":"qLRUVu.tEilkgu_1jIYNL87XeiBhhQUgFkyIhxa92nU-1715720028-1.0.1.1-IGqPyi5X0yxReJ2NtW38nPI8OcPwZI8L80KWW.SSAfTN8x72.7AI2X48YiEBd9rYlv9SPg8iRm5yg5.osUQ0pw","domain":".booth.pm","path":"/","expires":1747270590.424942,"httpOnly":true,"secure":true,"sameSite":"None"},{"name":"_gat_default","value":"1","domain":".booth.pm","path":"/","expires":1747270590.424942,"httpOnly":false,"secure":false},{"name":"_gid","value":"GA1.2.1224800951.1715720029","domain":".booth.pm","path":"/","expires":1747270590.424942,"httpOnly":false,"secure":false},{"name":"_ga","value":"GA1.1.1906835094.1715720029","domain":".booth.pm","path":"/","expires":1747270590.424942,"httpOnly":false,"secure":false},{"name":"_ga_RWT2QKJLDC","value":"GS1.1.1715720028.1.0.1715720028.60.0.0","domain":".booth.pm","path":"/","expires":1747270590.424942,"httpOnly":false,"secure":false},{"name":"__cf_bm","value":"Ul8aKyPsr7JTnsK4VrLcletHrAFSBPm_mfQ4lICJSwg-1715720022-1.0.1.1-DZdhxPPUyT.N96.y5j9apnu2CM35zDx26SAe_v67P.QC64UGBkp3kZcWE54DaJ0.8KJBIG5Uh8ceI1jTKLKyOg","domain":".booth.pm","path":"/","expires":1747270590.424942,"httpOnly":true,"secure":true,"sameSite":"None"}]
+      }
+    }
+  }
+  
+}
