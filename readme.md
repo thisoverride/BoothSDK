@@ -1,5 +1,5 @@
 # **[Booth.pm](http://booth.pm/) 非公式API**
-
+<p>English version <a href="readme-en.md">Here</a></p>
 ## **概要**
 <img src="banner.jpg">
 <a href="http://booth.pm">Booth.pm</a> Scraper APIは、人気のある電子商取引プラットフォーム Booth.pm から情報を抽出するためのウェブスクレイピングツールです。このAPIを使用すると、サイトで利用可能なすべての無料アイテムに関する詳細を取得し、それらをダウンロードする機能を提供します。
