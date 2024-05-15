@@ -1,7 +1,7 @@
 ## **Introduction**
-<p>Japanese version<a href="readme.md">Here</a></p>
+<p>Japanese version<a href="readme.md"> Here</a></p>
 <img src="banner.jpg">
-Booth SDK is a web scraping tool designed to extract various product information from the popular e-commerce platform [Booth.pm](http://booth.pm/). It allows you to obtain detailed information about all free and paid products available on the site, and also enables the download of free products.
+Booth SDK is a web scraping tool designed to extract various product information from the popular e-commerce platform <a href="https://booth.pm">Booth.pm</a>. It allows you to obtain detailed information about all free and paid products available on the site, and also enables the download of free products.
 
 ## **Contributions**
 
