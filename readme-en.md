@@ -24,6 +24,22 @@ void (async () => {
 
 ```
 
+# API Reference
+
+## Product
+
+- `listItems(pageIndex?: number)`: Retrieves a list of items. `pageIndex` is optional and defaults to 0.
+- `getItem(productID: number)`: Retrieves details of a specific item by its product ID.
+- `searchProducts(term: string)`: Searches for products using the provided search term.
+- `download(boothProduct: Downloadable)`: Downloads a specified product. Requires authentication.
+
+## Authenticator
+
+- `login(email: string, password: string): Promise<void>`: Logs in with the provided email and password.
+- `connect(): void`: Connects without credentials for limited access.
+
+
+
 ## **License**
 
 This project is licensed under the MIT license - please see the LICENSE file for more details.
