@@ -23,6 +23,19 @@ void (async () => {
 })();
 
 ```
+# API リファレンス
+
+## 商品
+
+- `listItems(pageIndex?: number)`: アイテムのリストを取得します。`pageIndex`はオプションで、デフォルトは0です。
+- `getItem(productID: number)`: 商品IDによる特定のアイテムの詳細を取得します。
+- `searchProducts(term: string)`: 提供された検索語で商品を検索します。
+- `download(boothProduct: Downloadable)`: 指定した商品をダウンロードします。認証が必要です。
+
+## Authenticator
+
+- `login(email: string, password: string): Promise<void>`: 提供されたメールとパスワードでログインします。
+- `connect(): void`: 限定的なアクセスのために認証なしで接続します。
 
 ## **ライセンス**
 
