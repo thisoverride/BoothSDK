@@ -1,25 +1,7 @@
 import type ProductServiceImpl from '../services/ProductServiceImpl';
-import AuthentificationController from './AuthentificationController';
+import type { Downloadable, ProductController } from '../../controller/ProductController';
 
-interface BoothProductItem {
-  id: number;
-  title: string;
-  detail: string;
-  images: string[];
-  sellerName: string;
-  sellerPic: string;
-  downloadLinks: downloadDataInfo[];
-}
-interface Downloadable {
-  path?: string;
-  boothProductItem: BoothProductItem;
-}
-interface downloadDataInfo {
-  itemTitle: string;
-  itemLink: string;
-}
-
-export default class ProductController {
+export default class ProductControllerImpl implements ProductController {
   private readonly _productService: ProductServiceImpl;
 
   constructor (productService: ProductServiceImpl) {
@@ -54,10 +36,7 @@ export default class ProductController {
     }
   }
 
-  public async download (boothProduct: Downloadable): Promise<void> {
-    if (!AuthentificationController.isAuthenticate()) {
-      throw new Error('You must be signed in to download any product.');
-    }
+  public async download (boothProduct: Downloadable): Promise<any> {
     try {
       const result = await this._productService.downloadProduct(boothProduct);
       return result;

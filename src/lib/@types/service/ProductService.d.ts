@@ -1,4 +1,4 @@
-import type { HttpResponse } from '../ControllerInterface';
+// import type { HttpResponse } from '../ControllerInterface';
 
 export interface ProductService {
   getItems: () => Promise<HttpResponse>;
