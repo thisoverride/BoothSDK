@@ -1,5 +1,5 @@
 import * as cheerio from 'cheerio';
-import type { AxiosInstance } from 'axios';
+import type { AxiosInstance, AxiosResponse } from 'axios';
 import BoothProduct from '../entity/BoothProduct';
 import fs from 'fs';
 
@@ -20,6 +20,11 @@ interface ProductEndpoints {
 //   shopURL: string;
 //   shopImageURL: string;
 // }
+
+interface DownloadStats {
+  successfulDownloads: number;
+  failedDownloads: number;
+}
 interface BoothProductItem {
   id: number;
   title: string;
@@ -27,14 +32,14 @@ interface BoothProductItem {
   images: string[];
   sellerName: string;
   sellerPic: string;
-  downloadLinks: downloadDataInfo[];
+  downloadLinks: DownloadDataInfo[];
 }
 interface Downloadable {
   path?: string;
   boothProductItem: BoothProductItem;
 }
 
-interface downloadDataInfo {
+interface DownloadDataInfo {
   itemTitle: string;
   itemLink: string;
 }
@@ -53,64 +58,70 @@ export default class ProductServiceImpl {
     this.axios = axios;
   }
 
-  public async getItems (page: number): Promise<any> {
+  public async getItems (page: number): Promise<CollectionBoothProduct> {
     const response = await this.axios.get(
       ProductServiceImpl.PATH_PRODUCT.listItems + page + '&sort=new');
     const collectionBoothProduct: CollectionBoothProduct = this._extractProducts(response.data);
-
     return collectionBoothProduct;
   }
 
-  public async getItem (id: number): Promise<any> {
+  public async getItem (articleId: number): Promise<BoothProductItem> {
     try {
-      const response = await this.axios.get(ProductServiceImpl.PATH_PRODUCT.getById + id);
-      const $: cheerio.CheerioAPI = cheerio.load(response.data);
-      const ageVerification = $('#age-confirmation .u-tpg-title1.u-m-0').text();
+      const response: AxiosResponse<any, any> = await this.axios.get(
+        ProductServiceImpl.PATH_PRODUCT.getById + articleId);
+      const html = response.data as string;
+      const $: cheerio.CheerioAPI = cheerio.load(html);
+      const ageVerification: string = $('#age-confirmation .u-tpg-title1.u-m-0').text();
 
       if (ageVerification) {
         throw new Error('Adulte Content is not enabled');
       }
 
-      const header = $('header.shop__text');
-      const articleTitle = header.find('.font-bold').text().trim();
-      const sellerName = header.find('a').text().trim();
-      const sellerPic = header.find('img').attr('src');
+      const header: cheerio.Cheerio<cheerio.Element> = $('header.shop__text');
+      const articleTitle: string = header.find('.font-bold').text().trim();
+      const sellerUsername: string = header.find('a').text().trim();
+      const sellerPic: string = header.find('img').attr('src') ?? '';
 
-      const downloadLinks: any[] = [];
+      const articleDownloadLinks: any[] = [];
       $('.cart-button-wrap a').each((_, link) => {
         const itemTitle = $(link).attr('title');
         const itemLink = $(link).attr('href');
         if (itemLink) {
-          downloadLinks.push({ itemTitle, itemLink });
+          articleDownloadLinks.push({ itemTitle, itemLink });
         }
       });
 
-      const description = $('.container')
+      const description: string = $('.container')
         .find('.js-market-item-detail-description.description p')
         .text()
         .trim()
         .replace(/\n/g, '');
 
-      const images: string[] = [];
+      const articleImages: string[] = [];
       $('img[data-origin]').each((_, element) => {
         const dataOrigin = $(element).attr('data-origin');
         if (dataOrigin) {
-          images.push(dataOrigin);
+          articleImages.push(dataOrigin);
         }
       });
 
-      const itemsData = {
-        id: id,
+      const itemsData: BoothProductItem = {
+        id: articleId,
         title: articleTitle,
         detail: description,
-        images: images,
-        sellerName: sellerName,
-        sellerPic: sellerPic,
-        downloadLinks: downloadLinks
+        images: articleImages,
+        sellerName: sellerUsername,
+        sellerPic: sellerPic ?? '',
+        downloadLinks: articleDownloadLinks
       };
       return itemsData;
     } catch (error: any) {
-      console.log(error);
+      if (error.code === 'ERR_BAD_REQUEST') {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        return {} as BoothProductItem;
+      } else {
+        throw new Error(`Error: ${error.message}`);
+      }
     }
   }
 
@@ -175,22 +186,30 @@ export default class ProductServiceImpl {
     return collectionBoothProduct;
   }
 
-  public async downloadProduct (downloadable: Downloadable): Promise<any> {
-    const downloadLinks = downloadable.boothProductItem.downloadLinks;
-
+  public async downloadProduct (downloadable: Downloadable): Promise<DownloadStats> {
+    const downloadLinks: DownloadDataInfo[] = downloadable.boothProductItem.downloadLinks;
+    let successfulDownloads = 0;
+    let failedDownloads = 0;
     for (const linkInfo of downloadLinks) {
-      const rs = await this.axios.get(linkInfo.itemLink, { responseType: 'stream' });
-
-      const file = fs.createWriteStream(`${downloadable.path}/${linkInfo.itemTitle}`);
-      rs.data.pipe(file);
-
-      file.on('finish', () => {
-        console.log('Fichier téléchargé avec succès.');
-      });
-
-      file.on('error', (error) => {
-        console.error('Erreur lors du téléchargement du fichier:', error);
-      });
+      try {
+        const rs = await this.axios.get(linkInfo.itemLink, { responseType: 'stream' });
+        const file: fs.WriteStream = fs.createWriteStream(`${downloadable.path}/${linkInfo.itemTitle}`);
+        rs.data.pipe(file);
+        await new Promise<void>((resolve, reject) => {
+          file.on('finish', () => {
+            successfulDownloads++;
+            resolve();
+          });
+          file.on('error', (error) => {
+            failedDownloads++;
+            reject(error);
+          });
+        });
+      } catch (e) {
+        console.error('Erreur lors de la requête de téléchargement :', e);
+        failedDownloads++;
+      }
     }
+    return { successfulDownloads, failedDownloads };
   }
 }

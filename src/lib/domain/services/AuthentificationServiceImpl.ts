@@ -55,19 +55,6 @@ export default class AuthentificationServiceImpl {
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-cache']
     });
     const page = await browser.newPage();
-    // await page.setRequestInterception(true);
-
-    // page.on('request', (req) => {
-    //   if (!['document', 'xhr', 'fetch', 'script'].includes(req.resourceType())) {
-    //     return req.abort();
-    //       }
-    //       req.continue();
-    //     });
-    // page.on('request', async (req) => {
-    //   if (!['document', 'xhr'].includes(req.resourceType())) {
-    //     await req.abort();
-    //   }
-    // });
     await page.goto(AuthentificationServiceImpl.PATH_AUTH.signIn);
 
     await page.waitForSelector('input[type="text"]');

@@ -1,17 +1,16 @@
 {
   "name": "booth-api",
-  "version": "1.0.0",
-  "main": "main.js",
+  "version": "1.0.1",
   "license": "MIT",
+  "main":"lib/BoothSDK.js",
+  "types": "lib/BoothSDK.d.ts",
   "scripts": {
-    "dev": "ts-node-dev src/main.ts",
-    "docker": "ts-node-dev src/main.ts",
-    "prod": "node build/main.js",
-    "build": "tsc",
+    "dev": "ts-node-dev src/lib/main.ts",
+    "build": "tsup",
     "test": "jest",
-    "lint-fix": "eslint --fix src/**/*.ts",
-    "wp": "webpack --watch"
+    "lint-fix": "eslint --fix src/**/*.ts"
   },
+  "files": ["lib"],
   "devDependencies": {
     "@types/jest": "^29.5.11",
     "@types/node": "^20.11.6",
@@ -26,7 +25,8 @@
     "eslint-plugin-promise": "^6.1.1",
     "jest": "^29.7.0",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "tsup": "^8.0.2"
   },
   "dependencies": {
     "axios": "^1.6.8",
