@@ -18,12 +18,12 @@ interface AuthEndpoints {
 }
 
 export default class AuthentificationServiceImpl {
-  public axios: AxiosInstance;
+  private _client: AxiosInstance;
   private static PATH_AUTH: AuthEndpoints;
 
   constructor (bootConfigPaths: AuthEndpoints, axios: AxiosInstance) {
     AuthentificationServiceImpl.PATH_AUTH = bootConfigPaths;
-    this.axios = axios;
+    this._client = axios;
   }
 
   public sdkConnect (): void {
@@ -36,11 +36,11 @@ export default class AuthentificationServiceImpl {
       ).toUTCString()}; ${cookie.secure ? 'Secure;' : ''} ${
         cookie.httpOnly ? 'HttpOnly;' : ''
       } ${cookie.sameSite ? `SameSite=${cookie.sameSite};` : ''}`;
-      jar.setCookieSync(cookieString, this.axios.defaults.baseURL ?? '');
+      jar.setCookieSync(cookieString, this._client.defaults.baseURL ?? '');
     });
-    this.axios.defaults.jar = jar;
-    this.axios.defaults.withCredentials = true;
-    this.axios = wrapper(this.axios);
+    this._client.defaults.jar = jar;
+    this._client.defaults.withCredentials = true;
+    this._client = wrapper(this._client);
   }
 
   public async signIn (credentials: credentials): Promise<any> {

@@ -4,4 +4,4 @@ yarn-error.log
 node_modules
 build/
 downloads/
-src/main.ts
+src/lib/main.ts

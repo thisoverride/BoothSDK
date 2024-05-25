@@ -1,10 +1,10 @@
-import { type ProductController } from '../controller/ProductController';
+import type { ProductService } from './services/ProductService';
 
 export type Language = 'en' | 'ja';
 
 export interface BaseConfig {
   lang: Language;
-  adulteContent: boolean;
+  adultContent: boolean;
 }
 
 export interface BoothPmPath {
@@ -14,10 +14,7 @@ export interface BoothPmPath {
     listItems: string;
     getById: string;
   };
-  authEndpoints: {
-    signIn: string;
-    meta: SdkConnect;
-  };
+  authEndpoints: AuthEndpoints;
 }
 
 export interface SdkConnect {
@@ -36,6 +33,6 @@ export interface ProductEndpoints {
 };
 
 export interface BoothSDK {
-  product: ProductController;
+  product: ProductService;
   authenticator: AuthentificationController;
 }

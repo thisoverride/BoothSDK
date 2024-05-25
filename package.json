@@ -8,7 +8,7 @@
     "dev": "ts-node-dev src/lib/main.ts",
     "build": "tsup",
     "test": "jest",
-    "lint-fix": "eslint --fix src/**/*.ts"
+    "lint-fix": "eslint --fix src/lib/domain/services/**/*.ts"
   },
   "files": ["lib"],
   "devDependencies": {
