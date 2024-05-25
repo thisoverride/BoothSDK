@@ -1,9 +1,9 @@
 {
   "name": "booth-api",
-  "version": "1.0.1",
+  "version": "1.1.8",
   "license": "MIT",
-  "main":"lib/BoothSDK.js",
-  "types": "lib/BoothSDK.d.ts",
+  "main":"lib/core/BoothSDK.ts.js",
+  "types": "lib/core/BoothSDK.d.ts",
   "scripts": {
     "dev": "ts-node-dev src/lib/main.ts",
     "build": "tsup",

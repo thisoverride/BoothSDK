@@ -105,7 +105,7 @@ export interface DownloadDataInfo {
  * Represents a collection of booth products.
  *
  */
-interface CollectionBoothProduct {
+export interface CollectionBoothProduct {
   /**
    * The count of items in the collection.
    * @type {number}
@@ -123,7 +123,7 @@ interface CollectionBoothProduct {
  * Represents download statistics.
  * @interface
  */
-interface DownloadStats {
+export interface DownloadStats {
   /**
    * The number of successful downloads.
    * @type {number}
@@ -141,7 +141,7 @@ interface DownloadStats {
  * Represents endpoints for product operations.
  * @interface
  */
-interface ProductEndpoints {
+export interface ProductEndpoints {
   /**
    * Endpoint for searching products.
    * @type {string}
