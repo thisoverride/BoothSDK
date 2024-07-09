@@ -21,14 +21,14 @@ export interface ProductService {
    * @param term - The search term used to find products.
    * @returns A promise that resolves to the search results.
    */
-  find: (term: string) => Promise<any>;
+  find: (term: string) => Promise<CollectionBoothProduct>;
 
   /**
    * Downloads a specified product.
    * @param boothProduct - The product to download.
-   * @returns A promise that resolves when the download is complete.
+   * @returns { Promise<DownloadStats> } A promise that resolves when the download is complete.
    */
-  download: (boothProduct: Downloadable) => Promise<any>;
+  download: (boothProduct: Downloadable) => Promise<DownloadStats>;
 }
 
 /**

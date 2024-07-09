@@ -95,9 +95,9 @@ export default class ProductServiceImpl implements ProductService {
     }
   }
 
-  public async find (qurey: string | null): Promise<any> {
+  public async find (qurey: string | null): Promise<CollectionBoothProduct> {
     if (!qurey) {
-      throw new Error('Item ID is not provided.');
+      throw new Error('term is not provided.');
     }
     const response = await this.axios.get(
       ProductServiceImpl.PATH_PRODUCT.search +
@@ -173,18 +173,15 @@ export default class ProductServiceImpl implements ProductService {
   }
 
   public async download (downloadable: Downloadable): Promise<DownloadStats> {
-    const downloadLinks: DownloadDataInfo[] =
-    downloadable.boothProductItem.downloadLinks;
-    let successfulDownloads = 0;
-    let failedDownloads = 0;
+    const downloadLinks: DownloadDataInfo[] = downloadable.boothProductItem.downloadLinks;
+    let successfulDownloads: number = 0;
+    let failedDownloads: number = 0;
     for (const linkInfo of downloadLinks) {
       try {
         const rs = await this.axios.get(linkInfo.itemLink, {
           responseType: 'stream'
         });
-        const file: fs.WriteStream = fs.createWriteStream(
-          `${downloadable.path}/${linkInfo.itemTitle}`
-        );
+        const file: fs.WriteStream = fs.createWriteStream(`${downloadable.path}/${linkInfo.itemTitle}`);
         rs.data.pipe(file);
         await new Promise<void>((resolve, reject) => {
           file.on('finish', () => {

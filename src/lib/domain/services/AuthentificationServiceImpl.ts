@@ -62,10 +62,9 @@ export default class AuthentificationServiceImpl {
     await page.type('input[type="password"]', password);
     await page.keyboard.press('Enter');
     await page.waitForNavigation({ waitUntil: 'networkidle0' });
-    const cookies = await page.cookies();
-    console.log(cookies);
+    // const cookies = await page.cookies();
 
-    // await browser.close();
+    await browser.close();
     return true;
   }
 }
