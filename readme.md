@@ -12,15 +12,18 @@ Booth SDKの機能や使いやすさを改善するための貢献を大歓迎�
 Booth SDKの使用例を以下に示します。
 
 ```jsx
-import BoothSDK from './lib/BoothSDK';
+import BoothPm from './core/BoothPm';
 
 void (async () => {
-  const boothSDK = new BoothSDK({ lang: 'en', adultContent: true });
-  boothSDK.authenticator.connect(); //資格情報なしで接続
+  const booth = new BoothPm({ lang: 'en', adultContent: true });
 
-  const response = await boothSDK.product.getItem(3787377); //ダウンロードする商品のID
-  await boothSDK.product.download({ path: './downloads', boothProductItem: response }); // ./downloadsに保存
+  const listResult = await booth.listProducts(0, { filter: 'New' });
+  const productDetails = await booth.getProduct(listResult.items[6].productId);
+  const saveResult = await booth.save({ boothProduct: productDetails, path: './downloads' });
+
+  console.log(saveResult);
 })();
+
 
 ```
 # API リファレンス

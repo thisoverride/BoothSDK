@@ -1,3 +1,5 @@
+import type { BoothProduct } from './dto/Dto';
+
 /**
  * Interface for the product service.
  */
@@ -74,7 +76,7 @@ export interface BoothProductItem {
 /**
  * Represents a downloadable item with an optional path.
  */
-export interface Downloadable {
+export interface DownloadableData {
   /**
    * The optional path where the downloadable item can be found.
    */
@@ -83,7 +85,7 @@ export interface Downloadable {
   /**
    * The booth product item associated with the download.
    */
-  boothProductItem: BoothProductItem;
+  boothProduct: BoothProduct;
 }
 
 /**
@@ -113,6 +115,7 @@ export interface BoothProductI {
   shopImageURL: string;
 }
 
+
 /**
  * Represents a collection of booth products.
  *
@@ -128,7 +131,7 @@ export interface CollectionBoothProduct {
    * An array of booth products.
    * @type {BoothProduct[]}
    */
-  items: BoothProduct[];
+  items: BoothProductOverview[];
 }
 
 /**

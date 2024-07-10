@@ -12,14 +12,16 @@ We warmly welcome contributions aimed at improving the functionality and usabili
 Here is an example of how to use the Booth SDK.
 
 ```jsx
-import BoothSDK from './lib/BoothSDK';
+import BoothPm from './core/BoothPm';
 
 void (async () => {
-  const boothSDK = new BoothSDK({ lang: 'en', adultContent: true });
-  boothSDK.authenticator.connect(); //connect without credentials
+  const booth = new BoothPm({ lang: 'en', adultContent: true });
 
-  const response = await boothSDK.product.getItem(3787377); //Item id to download
-  await boothSDK.product.download({ path: './downloads', boothProductItem: response }); // saved to ./downloads
+  const listResult = await booth.listProducts(0, { filter: 'New' });
+  const productDetails = await booth.getProduct(listResult.items[6].productId);
+  const saveResult = await booth.save({ boothProduct: productDetails, path: './downloads' });
+
+  console.log(saveResult);
 })();
 
 ```
