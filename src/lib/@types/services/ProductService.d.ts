@@ -101,6 +101,18 @@ export interface DownloadDataInfo {
   itemLink: string;
 }
 
+export interface BoothProductI {
+  productId: number;
+  productBrand: string;
+  productCategory: number;
+  productName: string;
+  productPrice: number;
+  imageURL: string;
+  shopName: string;
+  shopURL: string;
+  shopImageURL: string;
+}
+
 /**
  * Represents a collection of booth products.
  *
@@ -114,9 +126,9 @@ export interface CollectionBoothProduct {
 
   /**
    * An array of booth products.
-   * @type {BoothProductI[]}
+   * @type {BoothProduct[]}
    */
-  items: BoothProductI[];
+  items: BoothProduct[];
 }
 
 /**
@@ -159,4 +171,10 @@ export interface ProductEndpoints {
    * @type {string}
    */
   getById: string;
+}
+
+type ListFilter = 'New' | 'Popularity' | 'Loves';
+
+export interface ListingFilter {
+  filter: ListFilter;
 }

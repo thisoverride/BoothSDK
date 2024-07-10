@@ -36,3 +36,11 @@ export interface BoothSDK {
   product: ProductService;
   authenticator: AuthentificationController;
 }
+
+export interface Headers {
+  Cookie: string;
+}
+export interface Config {
+  lang: string;
+  headers: Headers;
+}
