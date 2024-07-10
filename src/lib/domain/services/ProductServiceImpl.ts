@@ -1,133 +1,61 @@
+import ApiEndpoints from '../../core/api/ApiEndPoint';
+import type HttpClient from '../../core/api/HttpClient';
 import * as cheerio from 'cheerio';
-import type { AxiosInstance, AxiosResponse } from 'axios';
-import BoothProduct from '../entity/BoothProduct';
-import fs from 'fs';
-import type {
-  BoothProductItem,
-  CollectionBoothProduct,
-  DownloadDataInfo,
-  DownloadStats,
-  Downloadable,
-  ProductEndpoints,
-  ProductService
-} from '../../@types/services/ProductService';
+import BaseService from './base/BaseClient';
+import type { CollectionBoothProduct, ListingFilter } from '../../@types/services/ProductService';
+import BoothProduct, { Category, Downloadable, Images, Shop } from '../entity/BoothProduct';
+import BoothProductOverview from '../entity/BoothProductOverview';
 
-export default class ProductServiceImpl implements ProductService {
-  private static PATH_PRODUCT: ProductEndpoints;
-  private readonly axios: AxiosInstance;
+export default class ProductServiceImpl extends BaseService {
+  private readonly _httpclient: HttpClient;
 
-  constructor (bootConfigPaths: ProductEndpoints, axios: AxiosInstance) {
-    ProductServiceImpl.PATH_PRODUCT = bootConfigPaths;
-    this.axios = axios;
+  constructor (httpclient: HttpClient) {
+    super();
+    this._httpclient = httpclient;
   }
 
-  public async getListItems (page: number): Promise<CollectionBoothProduct> {
-    const response = await this.axios.get(
-      ProductServiceImpl.PATH_PRODUCT.listItems + page + '&sort=new'
-    );
-    const collectionBoothProduct: CollectionBoothProduct =
-      this._extractProducts(response.data);
-    return collectionBoothProduct;
-  }
+  public async listProducts (index?: number, filterOn?: ListingFilter): Promise<CollectionBoothProduct> {
+    let param: string | undefined;
 
-  public async getItem (articleId: number): Promise<BoothProductItem | null> {
-    try {
-      if (!Number(articleId)) {
-        throw new Error('Article id is not a number');
-      }
-      const response: AxiosResponse<any, any> = await this.axios.get(
-        ProductServiceImpl.PATH_PRODUCT.getById + articleId
-      );
-      const html = response.data as string;
-      const $: cheerio.CheerioAPI = cheerio.load(html);
-      const ageVerification: string = $(
-        '#age-confirmation .u-tpg-title1.u-m-0'
-      ).text();
-
-      if (ageVerification) {
-        throw new Error('Adulte Content is not enabled');
-      }
-
-      const header: cheerio.Cheerio<cheerio.Element> = $('header.shop__text');
-      const articleTitle: string = header.find('.font-bold').text().trim();
-      const sellerUsername: string = header.find('a').text().trim();
-      const sellerPic: string = header.find('img').attr('src') ?? '';
-
-      const articleDownloadLinks: any[] = [];
-      $('.cart-button-wrap a').each((_, link) => {
-        const itemTitle = $(link).attr('title');
-        const itemLink = $(link).attr('href');
-        if (itemLink) {
-          articleDownloadLinks.push({ itemTitle, itemLink });
-        }
-      });
-
-      const description: string = $('.container')
-        .find('.js-market-item-detail-description.description p')
-        .text()
-        .trim()
-        .replace(/\n/g, '');
-
-      const articleImages: string[] = [];
-      $('img[data-origin]').each((_, element) => {
-        const dataOrigin = $(element).attr('data-origin');
-        if (dataOrigin) {
-          articleImages.push(dataOrigin);
-        }
-      });
-
-      const itemsData: BoothProductItem = {
-        id: articleId,
-        title: articleTitle,
-        detail: description,
-        images: articleImages,
-        sellerName: sellerUsername,
-        sellerPic: sellerPic ?? '',
-        downloadLinks: articleDownloadLinks
-      };
-      return itemsData;
-    } catch (error: any) {
-      if (error.code === 'ERR_BAD_REQUEST') {
-        return null;
-      } else {
-        throw new Error(`Error: ${error.message}`);
+    if (filterOn) {
+      switch (filterOn.filter) {
+        case 'New':
+          param = 'new';
+          break;
+        case 'Popularity':
+          param = 'popularity';
+          break;
+        case 'Loves':
+          param = 'wish_lists';
+          break;
+        default:
+          throw new Error('Invalid_filter_provided.');
       }
     }
-  }
-
-  public async find (qurey: string | null): Promise<CollectionBoothProduct> {
-    if (!qurey) {
-      throw new Error('term is not provided.');
-    }
-    const response = await this.axios.get(
-      ProductServiceImpl.PATH_PRODUCT.search +
-        encodeURIComponent(qurey) +
-        '?&sort=new'
+    const wsData = await this.performRequest(async () =>
+      await this._httpclient.get(ApiEndpoints.products.listProducts(index, param))
     );
-    const collectionBoothProduct: CollectionBoothProduct =
-      this._extractProducts(response.data);
-
-    return collectionBoothProduct;
+    return this._extractProducts(wsData);
   }
 
   private _extractProducts (html: any): CollectionBoothProduct {
     const $ = cheerio.load(html as string);
 
-    const ageVerification = $('#age-confirmation .u-tpg-title1.u-m-0').text();
+    const ageVerification: string = $('#age-confirmation .u-tpg-title1.u-m-0').text();
     if (ageVerification) {
-      throw new Error('Adulte Content is not enabled');
+      throw new Error('Adulte_Content_is_not_enabled');
     }
 
     const elements = $('.l-cards-5cols li[data-product-id]');
     let totalArticle: string = $('.container b').text();
-    let totalPage: number = 0;
+    let count: number = 0;
 
     if (totalArticle && totalArticle.trim() !== '') {
       totalArticle = totalArticle.replace(/\D/g, '');
-      totalPage = Math.ceil(Number(totalArticle) / 60);
+      count = Math.ceil(Number(totalArticle) / 60);
     }
 
-    const itemsData: BoothProduct[] = [];
+    const itemsData: BoothProductOverview[] = [];
     elements.each((_index, element) => {
       const productId = $(element).attr('data-product-id');
       const productBrand = $(element).attr('data-product-brand');
@@ -151,52 +79,74 @@ export default class ProductServiceImpl implements ProductService {
         .find('.item-card__shop-info .user-avatar')
         .attr('src');
 
-      itemsData.push(new BoothProduct(
+      const boothProductOverview = new BoothProductOverview(
         Number(productId),
-        productBrand ?? '',
+        String(productBrand),
         Number(productCategory),
         productName,
         Number(productPrice),
-        imageURL ?? '',
+        imageURL,
         shopName,
-        shopURL ?? '',
-        shopImageURL ?? ''
-      ));
+        String(shopURL),
+        String(shopImageURL)
+      );
+
+      itemsData.push(boothProductOverview);
     });
 
     const collectionBoothProduct: CollectionBoothProduct = {
-      count: totalPage,
+      totalPage: count,
       items: itemsData
     };
 
     return collectionBoothProduct;
   }
 
-  public async download (downloadable: Downloadable): Promise<DownloadStats> {
-    const downloadLinks: DownloadDataInfo[] = downloadable.boothProductItem.downloadLinks;
-    let successfulDownloads: number = 0;
-    let failedDownloads: number = 0;
-    for (const linkInfo of downloadLinks) {
-      try {
-        const rs = await this.axios.get(linkInfo.itemLink, {
-          responseType: 'stream'
-        });
-        const file: fs.WriteStream = fs.createWriteStream(`${downloadable.path}/${linkInfo.itemTitle}`);
-        rs.data.pipe(file);
-        await new Promise<void>((resolve, reject) => {
-          file.on('finish', () => {
-            successfulDownloads++;
-            resolve();
-          });
-          file.on('error', (error) => {
-            failedDownloads++;
-            reject(error);
-          });
-        });
-      } catch (e) {
-        failedDownloads++;
+  public async getProduct (articleId: number): Promise<any | null> {
+    try {
+      if (!Number(articleId)) {
+        throw new Error('Product id is not a number');
+      }
+      const wsData: any = await this.performRequest(async () =>
+        await this._httpclient.get(ApiEndpoints.products.getById(articleId)));
+
+      const category: Category = {
+        id: wsData.category.id,
+        name: wsData.category.name
+      };
+
+      const images: Images[] = wsData.images.map((image: Images) => ({
+        original: image.original,
+        resized: image.resized
+      }));
+
+      const shop: Shop = {
+        name: wsData.shop.name,
+        subdomain: wsData.shop.subdomain,
+        thumbnail: wsData.shop.thumbnail_url,
+        url: wsData.shop.url
+      };
+
+      const boothProduct = new BoothProduct(
+        Number(wsData.id),
+        String(wsData.description),
+        category,
+        String(wsData.name),
+        String(wsData.price),
+        images,
+        shop,
+        Boolean(wsData.is_adult),
+        Number(wsData.wish_lists_count),
+        wsData.variations[0].downloadable.no_musics as Downloadable
+      );
+
+      return boothProduct;
+    } catch (error: any) {
+      if (error.code === 'ERR_BAD_REQUEST') {
+        return null;
+      } else {
+        throw new Error(`Error: ${error.message}`);
       }
     }
-    return { successfulDownloads, failedDownloads };
   }
 }

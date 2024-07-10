@@ -1,33 +1,62 @@
+export interface Category {
+  id: number;
+  name: string;
+}
+
+export interface Images {
+  original: string;
+  resized: string;
+}
+
+export interface Shop {
+  name: string;
+  subdomain: string;
+  thumbnail: string;
+  url: string;
+}
+
+export interface Downloadable {
+  fileName: string;
+  fileExtension: string;
+  name: string;
+  fileSize: string;
+  url: string;
+  path?: string;
+}
+
 export default class BoothProduct {
-  private readonly productId: number;
-  private readonly productBrand: string;
-  private readonly productCategory: number;
-  private readonly productName: string;
-  private readonly productPrice: number;
-  private readonly imageURL: string;
-  private readonly shopName: string;
-  private readonly shopURL: string;
-  private readonly shopImageURL: string;
+  private readonly id: number;
+  private readonly description: string;
+  private readonly category: Category;
+  private readonly name: string;
+  private readonly price: string;
+  private readonly images: Images[];
+  private readonly shop: Shop;
+  private readonly isAdult?: boolean;
+  private readonly liked: number;
+  private readonly downloadable: Downloadable;
 
   constructor (
-    productId: number,
-    productBrand: string,
-    productCategory: number,
+    id: number,
+    description: string,
+    category: Category,
     productName: string,
-    productPrice: number,
-    imageURL: string,
-    shopName: string,
-    shopURL: string,
-    shopImageURL: string
+    price: string,
+    images: Images[],
+    shop: Shop,
+    isAdult: boolean | undefined,
+    liked: number,
+    downloadable: Downloadable
   ) {
-    this.productId = productId;
-    this.productBrand = productBrand;
-    this.productCategory = productCategory;
-    this.productName = productName;
-    this.productPrice = productPrice;
-    this.imageURL = imageURL;
-    this.shopName = shopName;
-    this.shopURL = shopURL;
-    this.shopImageURL = shopImageURL;
+    this.id = id;
+    this.description = description;
+    this.category = category;
+    this.name = productName;
+    this.price = price;
+    this.images = images;
+    this.shop = shop;
+    this.isAdult = isAdult;
+    this.liked = liked;
+    this.downloadable = downloadable;
   }
 }

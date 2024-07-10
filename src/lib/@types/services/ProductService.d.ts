@@ -122,7 +122,7 @@ export interface CollectionBoothProduct {
    * The count of items in the collection.
    * @type {number}
    */
-  count: number;
+  totalPage: number;
 
   /**
    * An array of booth products.
