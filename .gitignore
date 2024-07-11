@@ -5,4 +5,3 @@ node_modules
 build/
 downloads/
 src/lib/main.ts
-lib
