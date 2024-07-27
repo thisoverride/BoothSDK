@@ -19,7 +19,10 @@ import BoothPm from './core/BoothPm';
 void (async () => {
   const booth = new BoothPm({ lang: 'en' });
 
-  const listResult: CollectionBoothProduct = await booth.listProducts(0, { sortBy: BoothPm.FILTERS.Loves, category: BoothPm.CATEGORIES.GAMES });
+  const listResult: CollectionBoothProduct = await booth.listProducts(0,{ 
+    sortBy: BoothPm.FILTERS.Loves, 
+    category: BoothPm.CATEGORIES.GAMES 
+    });
   const { productId }: BoothProductOverview = listResult.items[8];
   const product = await booth.getProduct(productId);
   await booth.save({ boothProduct: product, path: './download' });
