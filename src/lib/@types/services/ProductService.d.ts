@@ -76,10 +76,13 @@ export interface ProductEndpoints {
   getById: string;
 }
 
-// type ListFilter = 'New' | 'Popularity' | 'Loves';
-
 export interface ProductSearchFilter {
   sortBy?: ListFilter;
   category?: ProductCategory;
   ageRestriction?: AgeRestriction;
+}
+
+export interface LikedProduct {
+  item_ids: number[];
+  wishlists_counts: Record<string, number>;
 }

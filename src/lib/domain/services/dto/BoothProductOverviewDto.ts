@@ -11,6 +11,7 @@ export default class BoothProductOverviewDto implements BoothProductOverview {
   public readonly shopURL: string;
   public readonly shopImageURL: string;
   public readonly imageURL: string;
+  public readonly liked: number;
 
   constructor (
     productId: number,
@@ -22,7 +23,9 @@ export default class BoothProductOverviewDto implements BoothProductOverview {
     imageURL: string,
     shopName: string,
     shopURL: string,
-    shopImageURL: string) {
+    shopImageURL: string,
+    liked: number
+  ) {
     this.productId = productId;
     this.productBrand = productBrand;
     this.productCategory = productCategory;
@@ -33,5 +36,6 @@ export default class BoothProductOverviewDto implements BoothProductOverview {
     this.shopName = shopName;
     this.shopURL = shopURL;
     this.shopImageURL = shopImageURL;
+    this.liked = liked;
   }
 }

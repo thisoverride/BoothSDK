@@ -46,5 +46,6 @@ export interface BoothProductOverview {
   imageURL: string;
   shopName: string;
   shopURL: string;
+  liked: number;
   shopImageURL: string;
 }

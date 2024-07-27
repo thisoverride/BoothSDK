@@ -1,6 +1,6 @@
 import axios, { type AxiosRequestConfig } from 'axios';
-import ApiEndpoints from './ApiEndPoint';
 import type { Config } from '../../@types/BoothSDK';
+import ApiEndpoints from './ApiEndPoint';
 
 export default class HttpClient {
   private readonly BASE_URL: string;
@@ -25,44 +25,36 @@ export default class HttpClient {
       .join('; ');
   }
 
-  private async _request (method: string, endpoint: string, useBaseUrl: boolean, data?: any, params: any = {}, basicHeader?: boolean): Promise<any> {
+  private async _request<T>(method: string, endpoint: string, useBaseUrl: boolean, data?: any, params: any = {}, basicHeader?: boolean): Promise<T> {
     const urlPath: string = useBaseUrl ? `${this.BASE_URL}/${endpoint}` : endpoint;
-    console.log(urlPath);
+    const headers: any = {
+      Accept: basicHeader ? '*/*' : 'application/json',
+      Cookie: this.getCookiesString()
+    };
+
+    if (!params.responseType || params.responseType !== 'stream') {
+      headers['Content-Type'] = basicHeader ? 'text/html' : 'application/json;charset=utf-8';
+    }
+
     const options: AxiosRequestConfig = {
       method: method.toUpperCase(),
       url: urlPath,
-      headers: {
-        Accept: basicHeader ? '*/*' : 'application/json',
-        'Content-Type': basicHeader ? 'text/html' : 'application/json;charset=utf-8',
-        Cookie: this.getCookiesString()
-      },
+      headers,
       params: method.toUpperCase() === 'GET' ? params : undefined,
       data: method.toUpperCase() !== 'GET' ? data : undefined,
       responseType: params.responseType
     };
+
     try {
       return (await axios(options)).data;
     } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          console.error('Error response data:', error.response.data);
-          console.error('Error response status:', error.response.status);
-          console.error('Error response headers:', error.response.headers);
-        } else if (error.request) {
-          console.error('Error request:', error.request);
-        } else {
-          console.error('Error message:', error.message);
-        }
-        console.error('Error config:', error.config);
-      } else {
-        console.error('Error message:', error.message);
-      }
+      console.log(error);
       throw error;
     }
   }
 
-  public async get<T>(endpoint: string, params?: any): Promise<T> {
-    return await this._request('GET', endpoint, true, undefined, params, false);
+  public async get<T>(endpoint: string, params?: any, useBaseUrl = true): Promise<T> {
+    return await this._request('GET', endpoint, useBaseUrl, undefined, params, false);
   }
 
   public async stream<T>(endpoint: string): Promise<T> {

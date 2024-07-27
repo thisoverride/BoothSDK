@@ -1,5 +1,5 @@
 export default class BaseService {
-  protected async performRequest (requestFunction: () => Promise<any>): Promise<any> {
+  protected async performRequest<T>(requestFunction: () => Promise<T>): Promise<T> {
     try {
       const response = await requestFunction();
       return response;

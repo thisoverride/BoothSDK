@@ -44,7 +44,7 @@ export default class BoothSDK implements IBoothSDK {
     this._wishlistService.addToWishlist(productId, productName);
   }
 
-  public getWishlistItems (): { productId: number; productName: string }[] {
+  public getWishlistItems (): Array<{ productId: number; productName: string; }> {
     return this._wishlistService.getWishlistItems();
   }
 

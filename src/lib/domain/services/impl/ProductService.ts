@@ -2,7 +2,7 @@ import fs from 'fs';
 import * as cheerio from 'cheerio';
 import BaseService from '../base/BaseClient';
 import type HttpClient from '../../../core/api/HttpClient';
-import type { CollectionBoothProduct, DownloadableData, DownloadStats, ProductSearchFilter } from '../../../@types/services/ProductService';
+import type { CollectionBoothProduct, DownloadableData, DownloadStats, LikedProduct, ProductSearchFilter } from '../../../@types/services/ProductService';
 import type { BoothProduct, BoothProductOverview, Category, Downloadable, Images, Shop } from '../../../@types/services/dto/Dto';
 import ApiEndpoints from '../../../core/api/ApiEndPoint';
 import BoothProductDto from '../dto/BoothProductDto';
@@ -26,7 +26,7 @@ export default class ProductService extends BaseService {
     const wsData = await this.performRequest(async () =>
       await this._httpclient.get(ApiEndpoints.products.listProducts(index, filterOn))
     );
-    return this._extractProducts(wsData);
+    return await this._extractProducts(wsData);
   }
 
   public async getProduct (articleId: number): Promise<BoothProduct> {
@@ -83,7 +83,7 @@ export default class ProductService extends BaseService {
       await this._httpclient.get(ApiEndpoints.products.search(term, filterOn))
     );
 
-    return this._extractProducts(wsData);
+    return await this._extractProducts(wsData);
   }
 
   public async download (downloadableData: DownloadableData): Promise<DownloadStats> {
@@ -93,19 +93,21 @@ export default class ProductService extends BaseService {
     let failedDownloads: number = 0;
     for (const linkInfo of downloadLinks) {
       try {
-        const wsData = await this.performRequest(async () =>
+        const wsData: any = await this.performRequest(async () =>
           await this._httpclient.stream(ApiEndpoints.products.save(linkInfo.url as string)));
         if (!await DirManager.folderExists(`${downloadableData.path}`)) {
           await DirManager.createDir((`${downloadableData.path}`));
         }
-        const file: fs.WriteStream = fs.createWriteStream(`${downloadableData.path}/${linkInfo.name}`);
-        wsData.pipe(file);
+        const fileStream: fs.WriteStream = fs.createWriteStream(`${downloadableData.path}/${linkInfo.name}`);
+
+        wsData.pipe(fileStream);
+
         await new Promise<void>((resolve, reject) => {
-          file.on('finish', () => {
+          fileStream.on('finish', () => {
             successfulDownloads++;
             resolve();
           });
-          file.on('error', (error) => {
+          fileStream.on('error', (error) => {
             failedDownloads++;
             reject(error);
           });
@@ -121,13 +123,13 @@ export default class ProductService extends BaseService {
     if (!term) {
       throw new Error('Term_is_null');
     }
-    const wsData = await this.performRequest(async () =>
-      await this._httpclient.get(ApiEndpoints.products.autoCompleteSuggestion(term))
+    const wsData = await this.performRequest<string[]>(async () =>
+      await this._httpclient.get(ApiEndpoints.products.autoCompleteSuggestion(term), undefined, false)
     );
     return wsData;
   }
 
-  private _extractProducts (html: any): CollectionBoothProduct {
+  private async _extractProducts (html: any): Promise<CollectionBoothProduct> {
     const $ = cheerio.load(html as string);
 
     const ageVerification: string = $('#age-confirmation .u-tpg-title1.u-m-0').text();
@@ -182,14 +184,21 @@ export default class ProductService extends BaseService {
         String(imageURL),
         shopName,
         String(shopURL),
-        String(shopImageURL)
+        String(shopImageURL),
+        0
       );
 
       itemsData.push(boothProductOverview);
     });
 
-    const tmpProductId = itemsData.map((product) => product.productId);
-    const wsData = this.performRequest(async () => await this._httpclient.get(ApiEndpoints.products.wishLists(tmpProductId)));
+    const tmpProductId: number[] = itemsData.map((product) => product.productId);
+    const wsData: LikedProduct = await this.performRequest<LikedProduct>(async () =>
+      await this._httpclient.get(ApiEndpoints.products.wishLists(tmpProductId), undefined, false));
+
+    itemsData.forEach(item => {
+      item.liked = wsData.wishlists_counts[item.productId] || 0;
+    });
+
     const collectionBoothProduct: CollectionBoothProduct = {
       totalPage: count,
       items: itemsData

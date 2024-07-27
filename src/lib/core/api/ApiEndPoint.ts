@@ -7,31 +7,40 @@ export default class ApiEndpoints {
   public static products = {
     listProducts: (index: number = 1, filters: ProductSearchFilter = { sortBy: ListFilter.Popularity }): string => {
       const baseUrl: string = filters.category && filters.category !== ProductCategory.ALL
-        ? `browse/${encodeURIComponent(filters.category)}`
+        ? `browse/${encodeURIComponent(filters.category as string)}`
         : 'items';
 
       const queryParams = new URLSearchParams({
         page: index.toString(),
-        max_price: '0',
-        ...(filters.sortBy && { sort: filters.sortBy })
+        max_price: '0'
       });
 
+      if (filters.sortBy) {
+        queryParams.append('sort', filters.sortBy as string);
+      }
+
       if (filters.ageRestriction) {
-        queryParams.append('adult', filters.ageRestriction);
+        queryParams.append('adult', filters.ageRestriction as string);
       }
 
       return `${baseUrl}?${queryParams.toString()}`;
     },
     search: (term: string, filters: ProductSearchFilter = { sortBy: ListFilter.Popularity }): string => {
       let baseUrl: string = filters.category && filters.category !== ProductCategory.ALL
-        ? `browse/${encodeURIComponent(filters.category)}`
+        ? `browse/${encodeURIComponent(filters.category as string)}`
         : 'search/';
 
       const queryParams = new URLSearchParams({
-        max_price: '0',
-        ...(filters.sortBy && { sort: filters.sortBy }),
-        ...(filters.ageRestriction && { adult: filters.ageRestriction })
+        max_price: '0'
       });
+
+      if (filters.sortBy) {
+        queryParams.append('sort', filters.sortBy as string);
+      }
+
+      if (filters.ageRestriction) {
+        queryParams.append('adult', filters.ageRestriction as string);
+      }
 
       if (baseUrl === 'search/') {
         baseUrl += `${term}?${queryParams.toString()}`;
@@ -48,10 +57,10 @@ export default class ApiEndpoints {
       itemIds.forEach(id => {
         queryParams.append('item_ids[]', id.toString());
       });
-      return `wish_lists.json?${queryParams.toString()}`;
+      return `https://accounts.booth.pm/wish_lists.json?${queryParams.toString()}`;
     },
 
-    autoCompleteSuggestion: (term: string) => `autocomplete/tag.json?term=${term}`,
+    autoCompleteSuggestion: (term: string) => `https://booth.pm/autocomplete/tag.json?term=${encodeURIComponent(term)}`,
     getById: (itemId: number) => `items/${itemId}`,
     save: (url: string) => url
   };
