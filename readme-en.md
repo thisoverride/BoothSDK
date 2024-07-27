@@ -23,11 +23,11 @@ void (async () => {
     sortBy: BoothPm.FILTERS.Loves, 
     category: BoothPm.CATEGORIES.GAMES 
     });
+  
   const { productId }: BoothProductOverview = listResult.items[8];
   const product = await booth.getProduct(productId);
-  await booth.save({ boothProduct: product, path: './download' });
+  await booth.save({ boothProduct: product, path: './downloads' });
 })();
-
 
 ```
 
