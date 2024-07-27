@@ -19,7 +19,7 @@ export default class HttpClient {
     };
   }
 
-  private getCookiesString(): string {
+  private getCookiesString (): string {
     return Object.entries(this.cookies)
       .map(([name, value]) => `${name}=${value}`)
       .join('; ');
@@ -27,6 +27,7 @@ export default class HttpClient {
 
   private async _request (method: string, endpoint: string, useBaseUrl: boolean, data?: any, params: any = {}, basicHeader?: boolean): Promise<any> {
     const urlPath: string = useBaseUrl ? `${this.BASE_URL}/${endpoint}` : endpoint;
+    console.log(urlPath);
     const options: AxiosRequestConfig = {
       method: method.toUpperCase(),
       url: urlPath,

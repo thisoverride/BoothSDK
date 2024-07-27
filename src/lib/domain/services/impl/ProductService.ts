@@ -1,15 +1,16 @@
 import fs from 'fs';
 import * as cheerio from 'cheerio';
-import BaseService from './base/BaseClient';
-import ApiEndpoints from '../../core/api/ApiEndPoint';
-import type HttpClient from '../../core/api/HttpClient';
-import type { CollectionBoothProduct, DownloadableData, DownloadStats, ListingFilter } from '../../@types/services/ProductService';
-import type { Category, Downloadable, Images, Shop } from '../../@types/services/dto/Dto';
-import BoothProductOverviewDto from '../dto/BoothProductOverviewDto';
+import BaseService from '../base/BaseClient';
+import type HttpClient from '../../../core/api/HttpClient';
+import type { CollectionBoothProduct, DownloadableData, DownloadStats, ProductSearchFilter } from '../../../@types/services/ProductService';
+import type { BoothProduct, BoothProductOverview, Category, Downloadable, Images, Shop } from '../../../@types/services/dto/Dto';
+import ApiEndpoints from '../../../core/api/ApiEndPoint';
 import BoothProductDto from '../dto/BoothProductDto';
-import DirManager from '../../utils/DirManager';
+import DirManager from '../../../utils/DirManager';
+import BoothProductOverviewDto from '../dto/BoothProductOverviewDto';
+import { ListFilter, ProductCategory } from '../../../utils/Utils';
 
-export default class ProductServiceImpl extends BaseService {
+export default class ProductService extends BaseService {
   private readonly _httpclient: HttpClient;
 
   constructor (httpclient: HttpClient) {
@@ -17,102 +18,71 @@ export default class ProductServiceImpl extends BaseService {
     this._httpclient = httpclient;
   }
 
-  public async listProducts (index?: number, filterOn?: ListingFilter): Promise<CollectionBoothProduct> {
-    let param: string | undefined;
-    if (filterOn) {
-      switch (filterOn.filter) {
-        case 'New':
-          param = 'new';
-          break;
-        case 'Popularity':
-          param = 'popularity';
-          break;
-        case 'Loves':
-          param = 'wish_lists';
-          break;
-        default:
-          throw new Error('Invalid_filter_provided.');
-      }
+  public async listProducts (index: number, filterOn?: ProductSearchFilter): Promise<CollectionBoothProduct> {
+    if (!this._validateFilter(filterOn)) {
+      throw new Error('Invalid_filter_provided.');
     }
+
     const wsData = await this.performRequest(async () =>
-      await this._httpclient.get(ApiEndpoints.products.listProducts(index, param))
+      await this._httpclient.get(ApiEndpoints.products.listProducts(index, filterOn))
     );
     return this._extractProducts(wsData);
   }
 
-  public async getProduct (articleId: number): Promise<any | null> {
-    try {
-      if (!Number(articleId)) {
-        throw new Error('Product id is not a number');
-      }
-      const wsData: any = await this.performRequest(async () =>
-        await this._httpclient.get(ApiEndpoints.products.getById(articleId)));
-
-      const category: Category = {
-        id: wsData.category.id,
-        name: wsData.category.name
-      };
-
-      const images: Images[] = wsData.images.map((image: Images) => ({
-        original: image.original,
-        resized: image.resized
-      }));
-
-      const shop: Shop = {
-        name: wsData.shop.name,
-        subdomain: wsData.shop.subdomain,
-        thumbnail: wsData.shop.thumbnail_url,
-        url: wsData.shop.url
-      };
-
-      const boothProduct = new BoothProductDto(
-        Number(wsData.id),
-        String(wsData.description),
-        category,
-        String(wsData.name),
-        String(wsData.price),
-        images,
-        shop,
-        Boolean(wsData.is_adult),
-        Number(wsData.wish_lists_count),
-        wsData.variations[0].downloadable.no_musics as Downloadable
-      );
-
-      return boothProduct;
-    } catch (error: any) {
-      if (error.code === 'ERR_BAD_REQUEST') {
-        return null;
-      } else {
-        throw new Error(`Error: ${error.message}`);
-      }
+  public async getProduct (articleId: number): Promise<BoothProduct> {
+    if (!Number(articleId)) {
+      throw new Error('Product_id_is_not_a_number');
     }
+
+    const wsData: any = await this.performRequest(async () =>
+      await this._httpclient.get(ApiEndpoints.products.getById(articleId)));
+
+    const category: Category = {
+      id: wsData.category.id,
+      name: wsData.category.name
+    };
+
+    const images: Images[] = wsData.images.map((image: Images) => ({
+      original: image.original,
+      resized: image.resized
+    }));
+
+    const shop: Shop = {
+      name: wsData.shop.name,
+      subdomain: wsData.shop.subdomain,
+      thumbnail: wsData.shop.thumbnail_url,
+      url: wsData.shop.url
+    };
+
+    const boothProduct = new BoothProductDto(
+      Number(wsData.id),
+      String(wsData.description),
+      category,
+      String(wsData.name),
+      String(wsData.price),
+      images,
+      shop,
+      Boolean(wsData.is_adult),
+      Number(wsData.wish_lists_count),
+      wsData.variations[0].downloadable.no_musics as Downloadable
+    );
+
+    return boothProduct;
   }
 
-  public async search (term: string, filterOn?: ListingFilter): Promise<CollectionBoothProduct> {
+  public async search (term: string, filterOn?: ProductSearchFilter): Promise<CollectionBoothProduct> {
     if (!term) {
-      throw new Error('term is not provided.');
+      throw new Error('Term_is_not_provided.');
     }
-    let param: string | undefined;
 
-    if (filterOn) {
-      switch (filterOn.filter) {
-        case 'New':
-          param = 'new';
-          break;
-        case 'Popularity':
-          param = undefined;
-          break;
-        case 'Loves':
-          param = 'wish_lists';
-          break;
-        default:
-          throw new Error('Invalid_filter_provided');
-      }
+    if (!this._validateFilter(filterOn)) {
+      throw new Error('Invalid_filter_provided.');
     }
 
     const wsData = await this.performRequest(async () =>
-      await this._httpclient.get(ApiEndpoints.products.search(term, param))
+      await this._httpclient.get(ApiEndpoints.products.search(term, filterOn))
     );
+
     return this._extractProducts(wsData);
   }
 
@@ -147,6 +117,16 @@ export default class ProductServiceImpl extends BaseService {
     return { successfulDownloads, failedDownloads };
   }
 
+  public async autocomplete (term: string): Promise<string[]> {
+    if (!term) {
+      throw new Error('Term_is_null');
+    }
+    const wsData = await this.performRequest(async () =>
+      await this._httpclient.get(ApiEndpoints.products.autoCompleteSuggestion(term))
+    );
+    return wsData;
+  }
+
   private _extractProducts (html: any): CollectionBoothProduct {
     const $ = cheerio.load(html as string);
 
@@ -164,7 +144,7 @@ export default class ProductServiceImpl extends BaseService {
       count = Math.ceil(Number(totalArticle) / 60);
     }
 
-    const itemsData: BoothProductOverviewDto[] = [];
+    const itemsData: BoothProductOverview[] = [];
     elements.each((_index, element) => {
       const productId = $(element).attr('data-product-id');
       const productBrand = $(element).attr('data-product-brand');
@@ -181,6 +161,10 @@ export default class ProductServiceImpl extends BaseService {
         .find('.item-card__shop-info .item-card__shop-name')
         .text()
         .trim();
+      const isAdult = $(element)
+        .find('.badge.adult')
+        .text()
+        .trim();
       const shopURL = $(element)
         .find('.item-card__shop-info .item-card__shop-name-anchor')
         .attr('href');
@@ -193,8 +177,9 @@ export default class ProductServiceImpl extends BaseService {
         String(productBrand),
         Number(productCategory),
         productName,
+        isAdult !== '',
         Number(productPrice),
-        imageURL,
+        String(imageURL),
         shopName,
         String(shopURL),
         String(shopImageURL)
@@ -203,11 +188,23 @@ export default class ProductServiceImpl extends BaseService {
       itemsData.push(boothProductOverview);
     });
 
+    const tmpProductId = itemsData.map((product) => product.productId);
+    const wsData = this.performRequest(async () => await this._httpclient.get(ApiEndpoints.products.wishLists(tmpProductId)));
     const collectionBoothProduct: CollectionBoothProduct = {
       totalPage: count,
       items: itemsData
     };
 
     return collectionBoothProduct;
+  }
+
+  private _validateFilter (filterOn?: ProductSearchFilter): boolean {
+    if (filterOn?.sortBy && !Object.values(ListFilter).includes(filterOn.sortBy)) {
+      return false;
+    }
+    if (filterOn?.category && !Object.values(ProductCategory).includes(filterOn.category)) {
+      return false;
+    }
+    return true;
   }
 }

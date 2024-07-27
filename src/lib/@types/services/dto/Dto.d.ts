@@ -32,7 +32,19 @@ export interface BoothProduct {
   price: string;
   images: Images[];
   shop: Shop;
-  isAdult?: boolean;
+  isAdult: boolean;
   liked: number;
   downloadable: Downloadable;
+}
+
+export interface BoothProductOverview {
+  productId: number;
+  productBrand: string;
+  productCategory: number;
+  productName: string;
+  productPrice: number;
+  imageURL: string;
+  shopName: string;
+  shopURL: string;
+  shopImageURL: string;
 }

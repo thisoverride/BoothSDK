@@ -1,77 +1,5 @@
-import type { BoothProduct } from './dto/Dto';
-
-/**
- * Interface for the product service.
- */
-export interface ProductService {
-  /**
-   * Retrieves items with pagination.
-   * @param {number} page - The page number to retrieve.
-   * @returns {Promise<CollectionBoothProduct>} A promise that resolves to a collection of booth products.
-   */
-  getListItems: (page: number) => Promise<CollectionBoothProduct>;
-
-  /**
-   * Retrieves a specific item by its product ID.
-   * @param productID - The ID of the product to retrieve.
-   * @returns A promise that resolves to the product details.
-   */
-  getItem: (productID: number) => Promise<BoothProductItem | null>;
-
-  /**
-   * Searches for products based on a search term.
-   * @param term - The search term used to find products.
-   * @returns A promise that resolves to the search results.
-   */
-  find: (term: string) => Promise<CollectionBoothProduct>;
-
-  /**
-   * Downloads a specified product.
-   * @param boothProduct - The product to download.
-   * @returns { Promise<DownloadStats> } A promise that resolves when the download is complete.
-   */
-  download: (boothProduct: Downloadable) => Promise<DownloadStats>;
-}
-
-/**
- * Represents an item in the booth product catalog.
- */
-export interface BoothProductItem {
-  /**
-   * The unique identifier for the product.
-   */
-  id: number;
-
-  /**
-   * The title of the product.
-   */
-  title: string;
-
-  /**
-   * A detailed description of the product.
-   */
-  detail: string;
-
-  /**
-   * An array of image URLs representing the product.
-   */
-  images: string[];
-
-  /**
-   * The name of the seller offering the product.
-   */
-  sellerName: string;
-
-  /**
-   * The URL of the seller's profile picture.
-   */
-  sellerPic: string;
-
-  /**
-   * An array of download information for the product.
-   */
-  downloadLinks: downloadDataInfo[];
-}
+import type { AgeRestriction, ListFilter, ProductCategory } from '../../utils/Utils';
+import type { BoothProductOverview } from './dto/Dto';
 
 /**
  * Represents a downloadable item with an optional path.
@@ -85,36 +13,8 @@ export interface DownloadableData {
   /**
    * The booth product item associated with the download.
    */
-  boothProduct: BoothProduct;
+  boothProduct: Boothproduct;
 }
-
-/**
-   * Represents the information required to download a specific item.
-   */
-export interface DownloadDataInfo {
-  /**
-   * The title of the downloadable item.
-   */
-  itemTitle: string;
-
-  /**
-   * The URL link to download the item.
-   */
-  itemLink: string;
-}
-
-export interface BoothProductI {
-  productId: number;
-  productBrand: string;
-  productCategory: number;
-  productName: string;
-  productPrice: number;
-  imageURL: string;
-  shopName: string;
-  shopURL: string;
-  shopImageURL: string;
-}
-
 
 /**
  * Represents a collection of booth products.
@@ -129,7 +29,7 @@ export interface CollectionBoothProduct {
 
   /**
    * An array of booth products.
-   * @type {BoothProduct[]}
+   * @type {BoothProductOverview[]}
    */
   items: BoothProductOverview[];
 }
@@ -176,8 +76,10 @@ export interface ProductEndpoints {
   getById: string;
 }
 
-type ListFilter = 'New' | 'Popularity' | 'Loves';
+// type ListFilter = 'New' | 'Popularity' | 'Loves';
 
-export interface ListingFilter {
-  filter: ListFilter;
+export interface ProductSearchFilter {
+  sortBy?: ListFilter;
+  category?: ProductCategory;
+  ageRestriction?: AgeRestriction;
 }
