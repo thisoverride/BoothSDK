@@ -1,42 +1,54 @@
-## **はじめに**
+## はじめに
+
 <p>English version <a href="readme-en.md">Here</a></p>
+
 <img src="banner.jpg">
-Booth SDKは、人気のあるeコマースプラットフォーム <a href="https://booth.pm">Booth.pm</a> からさまざまな商品情報を抽出するためのウェブスクレイピングツールです。サイト上のすべての無料および有料商品の詳細情報を取得することが可能で、無料の商品のダウンロードも可能です。
 
-## **貢献**
+Booth SDKは、人気のあるeコマースプラットフォーム<a href="[https://booth.pm](https://booth.pm/)">Booth.pm</a>からさまざまな商品情報を抽出するためのウェブスクレイピングツールです。サイト上のすべての無料および有料商品の詳細情報を取得でき、無料商品のダウンロードも可能です。
 
-Booth SDKの機能や使いやすさを改善するための貢献を大歓迎します。バグを見つけた場合、機能の要望がある場合、またはコードに貢献したい場合は、私たちの貢献ガイドラインに従ってください。
+## 貢献
 
-## **使用例**
+Booth SDKの機能と使いやすさを向上させるための貢献を心より歓迎します。バグを見つけた場合、機能のリクエストがある場合、またはコードに貢献したい場合は、貢献ガイドラインに従ってください。
 
-Booth SDKの使用例を以下に示します。
+## 使用例
+
+以下は、Booth SDKの使用例です。
 
 ```jsx
-import BoothSDK from './lib/BoothSDK';
+import type { BoothProductOverview } from './@types/services/dto/Dto';
+import type { CollectionBoothProduct } from './@types/services/ProductService';
+import BoothPm from './core/BoothPm';
 
 void (async () => {
-  const boothSDK = new BoothSDK({ lang: 'en', adultContent: true });
-  boothSDK.authenticator.connect(); //資格情報なしで接続
-
-  const response = await boothSDK.product.getItem(3787377); //ダウンロードする商品のID
-  await boothSDK.product.download({ path: './downloads', boothProductItem: response }); // ./downloadsに保存
+    const booth = new BoothPm({ lang: 'en' });
+    const listResult: CollectionBoothProduct = await booth.listProducts(0, {
+        sortBy: BoothPm.FILTERS.Loves,
+        category: BoothPm.CATEGORIES.GAMES
+    });
+    const { productId }: BoothProductOverview = listResult.items[8];
+    const product = await booth.getProduct(productId);
+    await booth.save({ boothProduct: product, path: './downloads' });
 })();
 
 ```
+
 # API リファレンス
 
 ## 商品
 
-- `listItems(pageIndex?: number)`: アイテムのリストを取得します。`pageIndex`はオプションで、デフォルトは0です。
-- `getItem(productID: number)`: 商品IDによる特定のアイテムの詳細を取得します。
-- `searchProducts(term: string)`: 提供された検索語で商品を検索します。
-- `download(boothProduct: Downloadable)`: 指定した商品をダウンロードします。認証が必要です。
+- `listProducts(index: number = 1, filterOn?: ProductSearchFilter)`: 商品のリストを取得します。インデックスはページインデックスを指定し、デフォルトは1です。`filterOn`を使用して商品リストにフィルターを適用できます。
+- `getProduct(productId: number)`: 特定の商品IDの詳細を取得します。
+- `find(term: string, filterOn?: ProductSearchFilter)`: 指定された検索用語を使用して商品を検索します。`filterOn`で追加のフィルタリングが可能です。
+- `autocomplete(query: string)`: クエリに基づいてオートコンプリートの提案を提供します。
+- `save(downloadableData: DownloadableData)`: 指定された商品をダウンロードします。商品情報を含む`downloadableData`オブジェクトが必要です。
 
-## Authenticator
+## ウィッシュリスト
 
-- `login(email: string, password: string): Promise<void>`: 提供されたメールとパスワードでログインします。
-- `connect(): void`: 限定的なアクセスのために認証なしで接続します。
+- `addToWishlist(productId: number, productName: string)`: 商品をウィッシュリストに追加します。
+- `getWishlistItems()`: ウィッシュリスト内のすべてのアイテムを取得します。
+- `clearWishlist()`: ウィッシュリストをクリアします。
+- `removeFromWishlist(productId: number)`: 商品IDでウィッシュリストから商品を削除します。
 
-## **ライセンス**
+## ライセンス
 
-このプロジェクトはMITライセンスの下でライセンスされています - 詳細はLICENSEファイルをご覧ください。
+このプロジェクトはMITライセンスの下でライセンスされています。詳細についてはLICENSEファイルをご参照ください。
