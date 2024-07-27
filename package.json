@@ -11,6 +11,20 @@
     "lint-fix": "eslint --fix src/lib/domain/services/**/*.ts"
   },
   "files": ["lib"],
+  "keywords": [
+    "booth",
+    "boothsdk",
+    "boothapi",
+    "api",
+    "pixiv",
+    "boothpm",
+    "vroid",
+    "vrm",
+    "search",
+    "autocomplete",
+    "typescript",
+    "vtuber"
+  ],
   "devDependencies": {
     "@types/jest": "^29.5.11",
     "@types/node": "^20.11.6",
