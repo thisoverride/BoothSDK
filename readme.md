@@ -12,17 +12,19 @@ Booth SDKの機能や使いやすさを改善するための貢献を大歓迎�
 Booth SDKの使用例を以下に示します。
 
 ```jsx
+import type { BoothProductOverview } from './@types/services/dto/Dto';
+import type { CollectionBoothProduct } from './@types/services/ProductService';
 import BoothPm from './core/BoothPm';
 
 void (async () => {
-  const booth = new BoothPm({ lang: 'en', adultContent: true });
+  const booth = new BoothPm({ lang: 'en' });
 
-  const listResult = await booth.listProducts(0, { filter: 'New' });
-  const productDetails = await booth.getProduct(listResult.items[6].productId);
-  const saveResult = await booth.save({ boothProduct: productDetails, path: './downloads' });
-
-  console.log(saveResult);
+  const listResult: CollectionBoothProduct = await booth.listProducts(0, { sortBy: BoothPm.FILTERS.Loves, category: BoothPm.CATEGORIES.GAMES });
+  const { productId }: BoothProductOverview = listResult.items[8];
+  const product = await booth.getProduct(productId);
+  await booth.save({ boothProduct: product, path: './download' });
 })();
+
 
 
 ```
