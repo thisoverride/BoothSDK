@@ -1,6 +1,6 @@
 ## はじめに
 
-<p>日本語版は<a href="[readme.md](http://readme.md/)">こちら</a></p>
+<p>English version <a href="readme-en.md">Here</a></p>
 
 <img src="banner.jpg">
 
