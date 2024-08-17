@@ -16,12 +16,12 @@ Booth SDKの機能と使いやすさを向上させるための貢献を心よ�
 
 ```jsx
 import type { BoothProductOverview } from './@types/services/dto/Dto';
-import type { CollectionBoothProduct } from './@types/services/ProductService';
+import type { BoothProductCollection } from './@types/services/ProductService';
 import BoothPm from './core/BoothPm';
 
 void (async () => {
     const booth = new BoothPm({ lang: 'en' });
-    const listResult: CollectionBoothProduct = await booth.listProducts(0, {
+    const listResult: BoothProductCollection = await booth.listProducts(0, {
         sortBy: BoothPm.FILTERS.Loves,
         category: BoothPm.CATEGORIES.GAMES
     });
