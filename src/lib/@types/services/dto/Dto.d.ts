@@ -46,6 +46,7 @@ export interface BoothProductOverview {
   imageURL: string;
   shopName: string;
   shopURL: string;
+  isAdult: boolean;
   liked: number;
   shopImageURL: string;
 }

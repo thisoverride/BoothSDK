@@ -1,6 +1,6 @@
 import type { BaseConfig, Config, IBoothSDK } from '../@types/BoothSDK';
 import type { BoothProduct } from '../@types/services/dto/Dto';
-import type { CollectionBoothProduct, DownloadableData, DownloadStats, ProductSearchFilter } from '../@types/services/ProductService';
+import type { BoothProductCollection, DownloadableData, DownloadStats, ProductSearchFilter } from '../@types/services/ProductService';
 import ProductService from '../domain/services/impl/ProductService';
 import WishlistService from '../domain/services/impl/WishlistService';
 import { AgeRestriction, ListFilter, ProductCategory } from '../utils/Utils';
@@ -20,7 +20,7 @@ export default class BoothSDK implements IBoothSDK {
     this._wishlistService = new WishlistService();
   }
 
-  public async listProducts (index: number = 1, filterOn?: ProductSearchFilter): Promise<CollectionBoothProduct> {
+  public async listProducts (index: number = 1, filterOn?: ProductSearchFilter): Promise<BoothProductCollection> {
     return await this._productService.listProducts(index, filterOn);
   }
 
@@ -28,7 +28,7 @@ export default class BoothSDK implements IBoothSDK {
     return await this._productService.getProduct(productId);
   }
 
-  public async find (term: string, filterOn?: ProductSearchFilter): Promise<CollectionBoothProduct> {
+  public async find (term: string, filterOn?: ProductSearchFilter): Promise<BoothProductCollection> {
     return await this._productService.search(term, filterOn);
   }
 

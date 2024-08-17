@@ -20,12 +20,18 @@ export interface DownloadableData {
  * Represents a collection of booth products.
  *
  */
-export interface CollectionBoothProduct {
+export interface BoothProductCollection {
   /**
-   * The count of items in the collection.
+   * The total number of articles.
    * @type {number}
    */
-  totalPage: number;
+  totalArticles: number;
+
+  /**
+   * The total number of pages.
+   * @type {number}
+   */
+  totalPages: number;
 
   /**
    * An array of booth products.
@@ -80,6 +86,7 @@ export interface ProductSearchFilter {
   sortBy?: ListFilter;
   category?: ProductCategory;
   ageRestriction?: AgeRestriction;
+  onlyFreeProducts?: boolean;
 }
 
 export interface LikedProduct {

@@ -5,42 +5,28 @@ export default class ApiEndpoints {
   public static readonly BASE_URL: string = 'https://booth.pm/';
 
   public static products = {
-    listProducts: (index: number = 1, filters: ProductSearchFilter = { sortBy: ListFilter.Popularity }): string => {
+    listProducts: (index: number = 1, filters: ProductSearchFilter = { sortBy: ListFilter.POPULARITY, onlyFreeProducts: false }): string => {
       const baseUrl: string = filters.category && filters.category !== ProductCategory.ALL
         ? `browse/${encodeURIComponent(filters.category as string)}`
         : 'items';
 
-      const queryParams = new URLSearchParams({
-        page: index.toString(),
-        max_price: '0'
-      });
+      const queryParams: URLSearchParams = new URLSearchParams({ page: index.toString() });
 
-      if (filters.sortBy) {
-        queryParams.append('sort', filters.sortBy as string);
-      }
-
-      if (filters.ageRestriction) {
-        queryParams.append('adult', filters.ageRestriction as string);
-      }
+      filters.sortBy && queryParams.append('sort', filters.sortBy);
+      filters.ageRestriction && queryParams.append('adult', filters.ageRestriction);
+      filters.onlyFreeProducts && queryParams.append('max_price', '0');
 
       return `${baseUrl}?${queryParams.toString()}`;
     },
-    search: (term: string, filters: ProductSearchFilter = { sortBy: ListFilter.Popularity }): string => {
+    search: (term: string, filters: ProductSearchFilter = { sortBy: ListFilter.POPULARITY }): string => {
       let baseUrl: string = filters.category && filters.category !== ProductCategory.ALL
         ? `browse/${encodeURIComponent(filters.category as string)}`
         : 'search/';
 
-      const queryParams = new URLSearchParams({
-        max_price: '0'
-      });
-
-      if (filters.sortBy) {
-        queryParams.append('sort', filters.sortBy as string);
-      }
-
-      if (filters.ageRestriction) {
-        queryParams.append('adult', filters.ageRestriction as string);
-      }
+      const queryParams: URLSearchParams = new URLSearchParams();
+      filters.sortBy && queryParams.append('sort', filters.sortBy);
+      filters.onlyFreeProducts && queryParams.append('max_price', '0');
+      filters.ageRestriction && queryParams.append('adult', filters.ageRestriction);
 
       if (baseUrl === 'search/') {
         baseUrl += `${term}?${queryParams.toString()}`;

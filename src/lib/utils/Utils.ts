@@ -1,9 +1,9 @@
 import DirManager from './DirManager';
 
 enum ListFilter {
-  New = 'new',
-  Popularity = 'popularity',
-  Loves = 'wish_lists'
+  NEW = 'new',
+  POPULARITY = 'popularity',
+  LOVES = 'wish_lists'
 }
 
 enum ProductCategory {

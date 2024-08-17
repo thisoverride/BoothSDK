@@ -2,7 +2,7 @@ import fs from 'fs';
 import * as cheerio from 'cheerio';
 import BaseService from '../base/BaseClient';
 import type HttpClient from '../../../core/api/HttpClient';
-import type { CollectionBoothProduct, DownloadableData, DownloadStats, LikedProduct, ProductSearchFilter } from '../../../@types/services/ProductService';
+import type { BoothProductCollection, DownloadableData, DownloadStats, LikedProduct, ProductSearchFilter } from '../../../@types/services/ProductService';
 import type { BoothProduct, BoothProductOverview, Category, Downloadable, Images, Shop } from '../../../@types/services/dto/Dto';
 import ApiEndpoints from '../../../core/api/ApiEndPoint';
 import BoothProductDto from '../dto/BoothProductDto';
@@ -18,7 +18,7 @@ export default class ProductService extends BaseService {
     this._httpclient = httpclient;
   }
 
-  public async listProducts (index: number, filterOn?: ProductSearchFilter): Promise<CollectionBoothProduct> {
+  public async listProducts (index: number, filterOn?: ProductSearchFilter): Promise<BoothProductCollection> {
     if (!this._validateFilter(filterOn)) {
       throw new Error('Invalid_filter_provided.');
     }
@@ -54,6 +54,10 @@ export default class ProductService extends BaseService {
       url: wsData.shop.url
     };
 
+    const variations = wsData.variations || [];
+    const downloadable = variations[0]?.downloadable || {};
+    const noMusics = (downloadable.no_musics as Downloadable) ?? null;
+
     const boothProduct = new BoothProductDto(
       Number(wsData.id),
       String(wsData.description),
@@ -64,13 +68,13 @@ export default class ProductService extends BaseService {
       shop,
       Boolean(wsData.is_adult),
       Number(wsData.wish_lists_count),
-      wsData.variations[0].downloadable.no_musics as Downloadable
+      noMusics
     );
 
     return boothProduct;
   }
 
-  public async search (term: string, filterOn?: ProductSearchFilter): Promise<CollectionBoothProduct> {
+  public async search (term: string, filterOn?: ProductSearchFilter): Promise<BoothProductCollection> {
     if (!term) {
       throw new Error('Term_is_not_provided.');
     }
@@ -129,13 +133,15 @@ export default class ProductService extends BaseService {
     return wsData;
   }
 
-  private async _extractProducts (html: any): Promise<CollectionBoothProduct> {
+  private async _extractProducts (html: any): Promise<BoothProductCollection> {
     const $ = cheerio.load(html as string);
 
     const ageVerification: string = $('#age-confirmation .u-tpg-title1.u-m-0').text();
     if (ageVerification) {
       throw new Error('Adulte_Content_is_not_enabled');
     }
+    const resultRaw: string = $('div.u-d-flex.u-align-items-center.u-pb-300.u-tpg-body2.u-justify-content-between b').text();
+    const resultsNumber: number = parseInt(resultRaw?.match(/\d+/g)?.join('') || '0', 10);
 
     const elements = $('.l-cards-5cols li[data-product-id]');
     let totalArticle: string = $('.container b').text();
@@ -199,12 +205,13 @@ export default class ProductService extends BaseService {
       item.liked = wsData.wishlists_counts[item.productId] || 0;
     });
 
-    const collectionBoothProduct: CollectionBoothProduct = {
-      totalPage: count,
+    const BoothProductCollection: BoothProductCollection = {
+      totalArticles: resultsNumber,
+      totalPages: count,
       items: itemsData
     };
 
-    return collectionBoothProduct;
+    return BoothProductCollection;
   }
 
   private _validateFilter (filterOn?: ProductSearchFilter): boolean {
