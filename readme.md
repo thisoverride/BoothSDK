@@ -20,16 +20,18 @@ import type { BoothProductCollection } from './@types/services/ProductService';
 import BoothPm from './core/BoothPm';
 
 void (async () => {
-    const booth = new BoothPm({ lang: 'en' });
-    const listResult: BoothProductCollection = await booth.listProducts(0, {
-        sortBy: BoothPm.FILTERS.Loves,
-        category: BoothPm.CATEGORIES.GAMES
-    });
-    const { productId }: BoothProductOverview = listResult.items[8];
-    const product = await booth.getProduct(productId);
-    await booth.save({ boothProduct: product, path: './downloads' });
-})();
+  const booth = new BoothPm({ lang: 'en' });
 
+  const listResult: BoothProductCollection = await booth.listProducts(0, {
+    sortBy: BoothPm.FILTERS.LOVES,
+    category: BoothPm.CATEGORIES.MODELS_3D,
+    onlyFreeProducts: true
+  });
+  console.log(listResult);
+  const { productId }: BoothProductOverview = listResult.items[8];
+  const product = await booth.getProduct(productId);
+  await booth.save({ boothProduct: product, path: './downloads' });
+})();
 ```
 
 # API リファレンス
