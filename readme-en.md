@@ -1,6 +1,7 @@
 ## Introduction
 
-<p>Japanese version <a href="[readme.md](http://readme.md/)">here</a></p>
+<p>Japanese version <a href="readme.md">here</a></p>
+
 
 <img src="banner.jpg">
 
