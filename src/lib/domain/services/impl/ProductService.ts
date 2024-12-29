@@ -56,11 +56,12 @@ export default class ProductService extends BaseService {
 
     const variations = wsData.variations || [];
     const downloadable = variations[0]?.downloadable || {};
-    const noMusics = (downloadable.no_musics as Downloadable) ?? null;
+    const noMusics: Downloadable = (downloadable.no_musics as Downloadable) ?? null;
+    const cleanedDescription = wsData.description.replace(/\n/g, ' ');
 
     const boothProduct = new BoothProductDto(
       Number(wsData.id),
-      String(wsData.description),
+      String(cleanedDescription),
       category,
       String(wsData.name),
       String(wsData.price),
