@@ -1,16 +1,24 @@
 {
-  "name": "booth-api",
+  "name": "booth-pm-sdk",
   "version": "2.0.0",
   "license": "MIT",
-  "main":"lib/core/BoothSDK.ts.js",
-  "types": "lib/core/BoothSDK.d.ts",
+  "main": "./lib/boothSdk.js",
+  "module": "./lib/boothSdk.mjs",
+  "types": "./lib/boothSdk.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/boothSdk.mjs",
+      "require": "./lib/boothSdk.js",
+      "types": "./lib/boothSdk.d.ts"
+    }
+  },
+  "files": ["lib"],
   "scripts": {
     "dev": "ts-node-dev src/lib/main.ts",
     "build": "tsup",
     "test": "jest",
     "lint-fix": "eslint --fix src/lib/domain/services/**/*.ts"
   },
-  "files": ["lib"],
   "keywords": [
     "booth",
     "boothsdk",
@@ -46,8 +54,6 @@
     "axios": "^1.6.8",
     "axios-cookiejar-support": "^5.0.2",
     "cheerio": "^1.0.0-rc.12",
-    "puppeteer": "^22.0.0",
-    "puppeteer-extra": "^3.3.6",
     "tough-cookie": "^4.1.4"
   }
 }

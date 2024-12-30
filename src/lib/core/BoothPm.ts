@@ -6,7 +6,7 @@ import WishlistService from '../domain/services/impl/WishlistService';
 import { AgeRestriction, ListFilter, ProductCategory } from '../utils/Utils';
 import HttpClient from './api/HttpClient';
 
-export default class BoothSDK implements IBoothSDK {
+export class BoothSDK implements IBoothSDK {
   public static readonly CATEGORIES = ProductCategory;
   public static readonly FILTERS = ListFilter;
   public static readonly AGE_RESTRICT = AgeRestriction;

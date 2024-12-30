@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/'],
+  entry: ['src/lib/boothSdk.ts'],
   format: ['cjs', 'esm'],
   dts: true,
   splitting: false,
