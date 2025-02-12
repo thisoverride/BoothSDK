@@ -19,6 +19,7 @@ export default class AuthService extends BaseService {
     if (!credentials) {
       throw new Error('Invalid_Credentials');
     }
+
     const browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
