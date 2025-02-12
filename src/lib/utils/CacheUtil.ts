@@ -1,8 +1,18 @@
-import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 import DirManager from './DirManager';
 
 interface CacheData {
+  cachedData: CachedItem[];
+  [key: string]: any;
+}
+
+interface CachedItem {
   [key: string]: string;
+}
+
+interface Credentials {
+  token?: string;
+  cookie?: string;
 }
 
 interface ComparisonResult {
@@ -12,37 +22,65 @@ interface ComparisonResult {
   };
 }
 
-interface aled {
-  email: string;
-} 
 interface CacheDifference {
   changed: boolean;
   message: string;
 }
 
 export default class CacheUtil {
-  private static async _hashValue (strValue: string): Promise<string> {
-    const value = await bcrypt.hash(strValue, 10);
-    return value;
+  private static _hashValue(strValue: string): string {
+    const hash = crypto.createHash('sha256');
+    hash.update(strValue);
+    return hash.digest('hex');
+  }
+
+  private static _encrypt (text: string): string {
+    const key = crypto.randomBytes(32);
+    const iv = crypto.randomBytes(16);
+
+    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+    let encrypted = cipher.update(text, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+
+    return `${iv.toString('hex')}:${key.toString('hex')}:${encrypted}`;
+  }
+
+  private static _decrypt (encryptedData: string): string {
+    const [ivHex, keyHex, encrypted] = encryptedData.split(':');
+
+    const iv = Buffer.from(ivHex, 'hex');
+    const key = Buffer.from(keyHex, 'hex');
+
+    const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+
+    return decrypted;
   }
 
   public static async saveToCache (data: CacheData): Promise<void> {
     try {
-      const hashedData: Record<string, any> = {};
-      const cachedData: any[] = [];
+      const encryptedData: Record<string, any> = {};
+      const cachedData: CachedItem[] = [];
 
       for (const [key, value] of Object.entries(data)) {
         if (key === 'email') {
-          const hashedEmail: string = await this._hashValue('email');
-          const hashedValue: string = await this._hashValue(value);
-          hashedData[hashedEmail] = hashedValue;
+          const hashedEmail = this._hashValue('email');
+          const encryptedValue = this._encrypt(String(value));
+          encryptedData[hashedEmail] = encryptedValue;
         } else {
-          cachedData.push({ [key]: value });
+          cachedData.push({ [this._encrypt(key)]: this._encrypt(JSON.stringify(value)) });
         }
       }
-      await DirManager.writeFile('./cache.json', JSON.stringify({ ...hashedData, cachedData }, null, 2));
+
+      await DirManager.writeFile(
+        './cache.json',
+        JSON.stringify({ ...encryptedData, cachedData })
+      );
     } catch (error) {
-      throw new Error(`Erreur lors de la sauvegarde du cache: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+      throw new Error(
+        `Erreur lors de la sauvegarde du cache: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
+      );
     }
   }
 
@@ -50,63 +88,53 @@ export default class CacheUtil {
     try {
       const fileContent = await DirManager.readfile('./cache.json');
       if (!fileContent) {
-        throw new Error('Putain de merde il n y a pas de fichier connard de merde kanha l arabe');
+        throw new Error('Le fichier de cache est manquant');
       }
       return JSON.parse(fileContent) as CacheData;
     } catch (error) {
       if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
-        return {};
+        return { cachedData: [] };
       }
-      throw new Error(`Erreur lors du chargement du cache: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+      throw new Error(
+        `Erreur lors du chargement du cache: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
+      );
     }
   }
 
-  public static async compareWithCache (newData: aled): Promise<void> {
+  public static async compareWithCache (newData: Record<string, string>): Promise<any> {
     try {
-      const cachedData: any = await this.loadFromCache();
-      const val: string[] = Object.keys(newData);
-      if (val.length > 2) {
-        throw new Error('va te faire y pas deux params');
+      const cachedData = await this.loadFromCache();
+      const keys = Object.keys(newData);
+      if (keys.length > 2) {
+        throw new Error('Illegal_parameters');
       }
-      const valCache = await this._hashValue(val[0]);
 
-      console.log(val[0]);
-      console.log(valCache);
-      console.log(cachedData);
+      const hashedKey = this._hashValue(keys[0]);
+      let isChanged: boolean = false;
+      if (cachedData[hashedKey]) {
+        const decryptedValue = this._decrypt(String(cachedData[hashedKey]));
+        isChanged = decryptedValue !== newData[keys[0]];
+      }
 
-      // cachedData[valCache]
-      // const isCachedValue: boolean = await bcrypt.compare('email', cachedData[valCache]);
-      // console.log(isCachedValue);
-
-      // const differences = await Object.entries(newData).reduce<Promise<Record<string, CacheDifference>>>(
-      //   async (accPromise, [key, value]) => {
-      //     const acc = await accPromise;
-      //     if (cachedData[key]) {
-      //       const isMatch = await bcrypt.compare(value, cachedData[key]);
-      //       if (!isMatch) {
-      //         acc[key] = {
-      //           changed: true,
-      //           message: 'Valeur différente détectée'
-      //         };
-      //       }
-      //     } else {
-      //       acc[key] = {
-      //         changed: true,
-      //         message: 'Nouvelle valeur'
-      //       };
-      //     }
-
-      //     return acc;
-      //   },
-      //   Promise.resolve({})
-      // );
-
-      // return {
-      //   hasChanges: Object.keys(differences).length > 0,
-      //   differences
-      // };
+      const credentials: Credentials = {};
+      if (!isChanged && Array.isArray(cachedData.cachedData)) {
+        for (const item of cachedData.cachedData) {
+          for (const [encryptedKey, encryptedValue] of Object.entries(item)) {
+            const decryptedKey = this._decrypt(encryptedKey);
+            if (decryptedKey === 'token') {
+              credentials.token = this._decrypt(encryptedValue);
+            }
+            if (decryptedKey === 'cookie') {
+              credentials.cookie = this._decrypt(encryptedValue);
+            }
+          }
+        }
+      }
+      return { isChanged, ...credentials };
     } catch (error) {
-      throw new Error(`Erreur lors de la comparaison: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
+      throw new Error(
+        `Erreur lors de la comparaison: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
+      );
     }
   }
 }
