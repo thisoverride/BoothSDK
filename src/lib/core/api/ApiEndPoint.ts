@@ -4,6 +4,12 @@ import { ListFilter, ProductCategory } from '../../utils/Utils';
 export default class ApiEndpoints {
   public static readonly BASE_URL: string = 'https://booth.pm/';
 
+  public static user = {
+    updateNickname: () => {
+      console.log('');
+    }
+  };
+
   public static products = {
     listProducts: (index: number = 1, filters: ProductSearchFilter = { sortBy: ListFilter.POPULARITY, onlyFreeProducts: false }): string => {
       const baseUrl: string = filters.category && filters.category !== ProductCategory.ALL

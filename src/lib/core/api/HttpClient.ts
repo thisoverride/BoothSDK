@@ -60,4 +60,7 @@ export default class HttpClient {
   public async stream<T>(endpoint: string): Promise<T> {
     return await this._request('GET', endpoint, false, undefined, { responseType: 'stream' }, true);
   }
+
+  public setCookie (cookie: string): void {}
+  public unsetCookie (): void {}
 }
